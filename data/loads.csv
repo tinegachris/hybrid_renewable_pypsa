@@ -1,0 +1,5 @@
+name,bus,carrier,p_set,q_set
+load1,bus1,AC,100,50
+load2,bus2,DC,150,75
+load3,bus3,AC,200,100
+load4,bus4,DC,250,125
