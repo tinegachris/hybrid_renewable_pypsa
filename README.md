@@ -26,13 +26,13 @@ To get started with this project, follow these steps:
   cd hybrid_renewable_pypsa
   ```
 
-1. **Install the required dependencies:**
+2. **Install the required dependencies:**
 
   ```sh
   pip install -r requirements.txt
   ```
 
-1. **Run the analysis:**
+3. **Run the analysis:**
 
   ```sh
   python scripts/run_analysis.py
