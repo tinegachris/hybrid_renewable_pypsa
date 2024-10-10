@@ -1,3 +1,13 @@
+[![GitHub license](https://img.shields.io/github/license/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/blob/main/LICENSE)
+[![GitHub contributors](https://img.shields.io/github/contributors/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/graphs/contributors)
+[![GitHub issues](https://img.shields.io/github/issues/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/issues)
+[![GitHub pull-requests](https://img.shields.io/github/issues-pr/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
+[![GitHub watchers](https://img.shields.io/github/watchers/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Watch)](https://github.com/Jtinegachris/hybrid_renewable_pypsa/watchers)
+[![GitHub forks](https://img.shields.io/github/forks/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Fork)](https://github.com/tinegachris/hybrid_renewable_pypsa/network/members)
+[![GitHub stars](https://img.shields.io/github/stars/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Sta)](https://github.com/tinegachris/hybrid_renewable_pypsa/stargazers)
+
 # Hybrid Renewable PyPSA Network Analysis
 
 ![image](https://github.com/user-attachments/assets/29608f2e-b8e6-4f5e-956a-45220517be5a)
