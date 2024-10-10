@@ -1,5 +1,5 @@
 name,v_nom,x,y,carrier
 bus1,110,10,20,AC
-bus2,220,30,40,DC
+bus2,220,30,40,AC
 bus3,110,50,60,AC
 bus4,220,70,80,DC
