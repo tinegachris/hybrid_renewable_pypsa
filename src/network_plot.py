@@ -16,7 +16,15 @@ class NetworkPlot:
 
   # # Plot the network using pypsa.Network.plot() method
   # def plot_network(self):
-  #   self.network.plot()
+  #   lines_current_type = self.network.lines.bus0.map(self.network.buses.carrier)
+  #   lines_current_type
+  #   self.network.plot(
+  #     line_colors=lines_current_type.map(lambda ct: "r" if ct == "DC" else "b"),
+  #     title="Network Plot",
+  #     color_geomap=True,
+  #     jitter=0.3,
+  #   )
+  #   plt.tight_layout()
 
   # Plot the network using matplotlib
   def plot_network(self):
