@@ -1,8 +1,8 @@
-#import warnings
-from network_setup import Network_Setup
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
-# Suppress specific warning from cartopy
-#warnings.filterwarnings("ignore", message='facecolor will have no effect as it has been defined as "never"')
+from network_setup import Network_Setup
 
 class NetworkPlot:
   """
@@ -14,11 +14,39 @@ class NetworkPlot:
     self.network_setup.setup_network()
     self.network = self.network_setup.get_network()
 
+  # # Plot the network using pypsa.Network.plot() method
+  # def plot_network(self):
+  #   self.network.plot()
+
+  # Plot the network using matplotlib
   def plot_network(self):
     """
     Plot the network using the setup network object.
     """
-    self.network.plot()
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+
+    ax.add_feature(cfeature.LAND)
+    ax.add_feature(cfeature.OCEAN)
+    ax.add_feature(cfeature.COASTLINE)
+    ax.add_feature(cfeature.BORDERS, linestyle=':')
+    ax.add_feature(cfeature.LAKES, alpha=0.5)
+    ax.add_feature(cfeature.RIVERS)
+
+    ax.set_extent([self.network.buses.x.min() - 1, self.network.buses.x.max() + 1, self.network.buses.y.min() - 1, self.network.buses.y.max() + 1])
+
+    ax.scatter(self.network.buses.x, self.network.buses.y, transform=ccrs.PlateCarree(), s=200, color='red', zorder=5)
+    for bus_name, bus in self.network.buses.iterrows():
+      ax.text(bus.x, bus.y, bus_name, transform=ccrs.PlateCarree(), fontsize=12, zorder=5)
+
+    for _, line in self.network.lines.iterrows():
+      bus0 = self.network.buses.loc[line.bus0]
+      bus1 = self.network.buses.loc[line.bus1]
+      ax.plot([bus0.x, bus1.x], [bus0.y, bus1.y], transform=ccrs.PlateCarree(), color='black', zorder=1)
+
+    print("Network is now plotting...\n")
+    plt.show()
 
 if __name__ == "__main__":
   data_folder = 'data'
