@@ -19,6 +19,7 @@ class Network_Setup:
     self._add_storage_units()
     self._add_loads()
     self._add_lines()
+    print("\nNetwork was setup successfully!\n")
 
   def _add_buses(self):
     buses_file = os.path.join(self.data_folder, 'buses.csv')
@@ -30,6 +31,7 @@ class Network_Setup:
       y=row['y'],
       carrier=row['carrier']
       )
+    print("\nBuses added successfully!\n")
 
   def _add_generators(self):
     generators_file = os.path.join(self.data_folder, 'generators.csv')
@@ -42,6 +44,7 @@ class Network_Setup:
       capital_cost=row['capital_cost'],
       marginal_cost=row['op_cost']
       )
+    print("Generators added successfully!\n")
 
   def _add_storage_units(self):
     storage_units_file = os.path.join(self.data_folder, 'storage_units.csv')
@@ -55,6 +58,7 @@ class Network_Setup:
       efficiency_store=row['efficiency_store'],
       efficiency_dispatch=row['efficiency_dispatch']
       )
+    print("Storage units added successfully!\n")
 
   def _add_loads(self):
     loads_file = os.path.join(self.data_folder, 'loads.csv')
@@ -66,6 +70,7 @@ class Network_Setup:
       p_set=load['p_set'],
       q_set=load['q_set']
       )
+    print("Loads added successfully!\n")
 
   def _add_lines(self):
     lines_file = os.path.join(self.data_folder, 'lines.csv')
@@ -79,62 +84,62 @@ class Network_Setup:
       capital_cost=line['capital_cost'],
       length=line['length']
       )
+    print("Lines added successfully!\n")
 
   def get_network(self):
     if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
-      print("Warning: The network is empty.")
+      print("Warning: The network is empty.\n")
     return self.network
 
   def get_generators(self):
     if self.network.generators.empty:
-      print("Warning: The generators DataFrame is empty.")
+      print("Warning: The generators DataFrame is empty.\n")
     return self.network.generators
 
   def get_loads(self):
     if self.network.loads.empty:
-      print("Warning: The loads DataFrame is empty.")
+      print("Warning: The loads DataFrame is empty.\n")
     return self.network.loads
 
   def get_lines(self):
     if self.network.lines.empty:
-      print("Warning: The lines DataFrame is empty.")
+      print("Warning: The lines DataFrame is empty.\n")
     return self.network.lines
 
   def get_buses(self):
     if self.network.buses.empty:
-      print("Warning: The buses DataFrame is empty.")
+      print("Warning: The buses DataFrame is empty.\n")
     return self.network.buses
 
   def get_time_series(self):
     if self.network.loads_t.p_set.empty:
-      print("Warning: The time series DataFrame is empty.")
+      print("Warning: The time series DataFrame is empty.\n")
     return self.network.loads_t.p_set
 
   def get_time_series_for_bus(self, bus_name):
     if bus_name not in self.network.loads_t.p_set.columns:
-      print(f"Warning: No time series data for bus '{bus_name}'.")
+      print(f"Warning: No time series data for bus '{bus_name}'.\n")
     return self.network.loads_t.p_set[bus_name]
 
   def get_time_series_for_generator(self, generator_name):
     if generator_name not in self.network.generators_t.p.columns:
-      print(f"Warning: No time series data for generator '{generator_name}'.")
+      print(f"Warning: No time series data for generator '{generator_name}'.\n")
     return self.network.generators_t.p[generator_name]
 
   def get_time_series_for_line(self, line_name):
     if line_name not in self.network.lines_t.p0.columns:
-      print(f"Warning: No time series data for line '{line_name}'.")
+      print(f"Warning: No time series data for line '{line_name}'.\n")
     return self.network.lines_t.p0[line_name]
 
   def get_time_series_for_load(self, load_name):
     if load_name not in self.network.loads_t.p.columns:
-      print(f"Warning: No time series data for load '{load_name}'.")
+      print(f"Warning: No time series data for load '{load_name}'.\n")
     return self.network.loads_t.p[load_name]
 
 if __name__ == "__main__":
   data_folder = 'data'
   network_setup = Network_Setup(data_folder)
   network_setup.setup_network()
-  print("\nNetwork was setup successfully!\n")
   network = network_setup.get_network()
   print(network.buses, "\n")
   print(network.generators, "\n")
