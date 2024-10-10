@@ -19,7 +19,7 @@ class Network_Setup:
     self._add_storage_units()
     self._add_loads()
     self._add_lines()
-    print("\nNetwork was setup successfully!\n")
+    print("Network was setup successfully!\n")
 
   def _add_buses(self):
     buses_file = os.path.join(self.data_folder, 'buses.csv')
