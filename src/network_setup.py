@@ -2,7 +2,6 @@ import pypsa
 import pandas as pd
 import os
 
-
 class Network_Setup:
   """
   NetworkSetup class for setting up and managing a PyPSA network.
@@ -96,9 +95,6 @@ class Network_Setup:
   def get_buses(self):
     return self.network.buses
 
-  def get_snapshots(self):
-    return self.network.snapshots
-
   def get_time_series(self):
     return self.network.loads_t.p_set
 
@@ -117,7 +113,9 @@ class Network_Setup:
 if __name__ == "__main__":
   data_folder = 'data'
   network_setup = Network_Setup(data_folder)
+  #print(Network_Setup.__doc__)
   network_setup.setup_network()
+  print("\nNetwork was setup successfully!\n")
   network = network_setup.get_network()
   print(network.buses)
   print(network.generators)
