@@ -1,5 +1,5 @@
-name,v_nom,x,y,carrier
-bus1,110,10,20,AC
-bus2,220,30,40,AC
-bus3,110,50,60,AC
-bus4,220,70,80,DC
+name,v_nom,x,y,carrier,v_mag_pu_set,v_mag_pu_min,v_mag_pu_max,control
+bus1,110,10,20,AC,1.0,0.0,inf,PQ
+bus2,220,30,40,AC,1.0,0.0,inf,PQ
+bus3,110,50,60,AC,1.0,0.0,inf,PQ
+bus4,220,70,80,DC,,,,

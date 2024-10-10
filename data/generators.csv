@@ -1,3 +1,2 @@
 name,bus,control,p_nom,efficiency,capital_cost,op_cost
-generator1,bus1,Slack,1000,0.4,1200,10
-generator2,bus2,PQ,500,0.2,800,5
+generator1,bus1,PQ,1000,0.4,1200,10
