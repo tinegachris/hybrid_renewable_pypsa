@@ -4,7 +4,7 @@ import cartopy.feature as cfeature
 
 from network_setup import Network_Setup
 
-class NetworkPlot:
+class Network_Plot:
   """
   A class to handle the plotting of the network.
   """
@@ -58,5 +58,5 @@ class NetworkPlot:
 
 if __name__ == "__main__":
   data_folder = 'data'
-  network_plot = NetworkPlot(data_folder)
+  network_plot = Network_Plot(data_folder)
   network_plot.plot_network()
