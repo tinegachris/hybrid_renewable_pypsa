@@ -1,2 +1,3 @@
 name,bus,control,p_nom,efficiency,capital_cost,op_cost
 generator1,bus1,PQ,1000,0.4,1200,10
+generator2,bus2,PQ,2000,0.5,1500,15

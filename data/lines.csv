@@ -1,4 +1,4 @@
 name,bus0,bus1,x,r,capital_cost,length
 line1,bus1,bus2,0.1,0.1,100,10
 line2,bus2,bus3,0.2,0.2,200,20
-line3,bus3,bus4,0.3,0.3,300,30
+line3,bus3,bus1,0.3,0.3,300,30
