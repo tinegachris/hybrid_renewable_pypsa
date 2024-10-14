@@ -1,4 +1,3 @@
-name,bus0,bus1,x,r,capital_cost,length
-line1,bus1,bus2,0.1,0.1,100,10
-line2,bus2,bus3,0.2,0.2,200,20
-line3,bus3,bus1,0.3,0.3,300,30
+name,bus0,bus1,length,r_per_length,x_per_length,c_per_length,s_nom,type,capital_cost,description
+Line_Hydro_to_Site,Hydro_11kV,AC_415,5.0,0.15,0.4,0.02,1500,MV_line,1200,5 km medium voltage line from hydropower to site.
+Line_Grid_to_Site,Grid_33kV,AC_415,1.0,0.05,0.2,0.01,4000,HV_line,1000,High voltage line connecting the grid to the AC bus.

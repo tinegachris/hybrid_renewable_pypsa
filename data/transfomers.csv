@@ -1,0 +1,4 @@
+name,bus0,bus1,s_nom,x_pu,r_pu,tap_position,tap_min,tap_max,tap_step,efficiency,capital_cost,description
+Transformer_Grid_to_AC,Grid_33kV,AC_415,4000,0.1,0.01,1,0.9,1.1,0.01,0.98,2000,Steps down 33 kV to 415 V from the utility grid.
+Transformer_Battery_AC,DC_1500,AC_415,2000,0.08,0.015,1,0.9,1.1,0.01,0.97,1500,Connects 800 V battery inverters to 415 V AC bus.
+Transformer_Hydro_to_11kV,AC_415,Hydro_11kV,1500,0.07,0.02,1,0.9,1.1,0.01,0.98,1800,Steps up 415 V hydro turbine output to 11 kV for transmission.
