@@ -29,7 +29,20 @@ class Network_Setup:
       v_nom=row['v_nom'],
       x=row['x'],
       y=row['y'],
-      carrier=row['carrier']
+      carrier=row['carrier'],
+      v_mag_pu_set=row.get('v_mag_pu_set', None),
+      v_mag_pu_min=row.get('v_mag_pu_min', None),
+      v_mag_pu_max=row.get('v_mag_pu_max', None),
+      control=row.get('control', None),
+      v_target=row.get('v_target', None),
+      marginal_cost=row.get('marginal_cost', None),
+      zone=row.get('zone', None),
+      type=row.get('type', None),
+      max_shunt_capacitor=row.get('max_shunt_capacitor', None),
+      min_shunt_capacitor=row.get('min_shunt_capacitor', None),
+      reactive_power_setpoint=row.get('reactive_power_setpoint', None),
+      load_profile=row.get('load_profile', None),
+      description=row.get('description', None)
       )
     print("\nBuses added successfully!\n")
 
@@ -39,10 +52,13 @@ class Network_Setup:
     for _, row in generators.iterrows():
       self.network.add("Generator", row['name'],
       bus=row['bus'],
+      control=row['control'],
       p_nom=row['p_nom'],
       efficiency=row['efficiency'],
       capital_cost=row['capital_cost'],
-      marginal_cost=row['op_cost']
+      marginal_cost=row['marginal_cost'],
+      p_max_pu=row['p_max_pu'],
+      p_min_pu=row['p_min_pu']
       )
     print("Generators added successfully!\n")
 
@@ -56,7 +72,15 @@ class Network_Setup:
       capital_cost=row['capital_cost'],
       state_of_charge_initial=row['state_of_charge_initial'],
       efficiency_store=row['efficiency_store'],
-      efficiency_dispatch=row['efficiency_dispatch']
+      efficiency_dispatch=row['efficiency_dispatch'],
+      max_hours=row['max_hours'],
+      marginal_cost=row['marginal_cost'],
+      p_min_pu=row['p_min_pu'],
+      p_max_pu=row['p_max_pu'],
+      cyclic_state_of_charge=row['cyclic_state_of_charge'],
+      state_of_charge_min=row['state_of_charge_min'],
+      state_of_charge_max=row['state_of_charge_max'],
+      description=row['description']
       )
     print("Storage units added successfully!\n")
 
@@ -66,9 +90,14 @@ class Network_Setup:
     for _, load in loads.iterrows():
       self.network.add("Load", load['name'],
       bus=load['bus'],
-      carrier=load['carrier'],
       p_set=load['p_set'],
-      q_set=load['q_set']
+      p_min=load['p_min'],
+      p_max=load['p_max'],
+      scaling_factor=load['scaling_factor'],
+      status=load['status'],
+      control_type=load['control_type'],
+      response_time=load['response_time'],
+      priority=load['priority']
       )
     print("Loads added successfully!\n")
 
@@ -79,12 +108,35 @@ class Network_Setup:
       self.network.add("Line", line['name'],
       bus0=line['bus0'],
       bus1=line['bus1'],
-      x=line['x'],
-      r=line['r'],
+      length=line['length'],
+      r=line['r_per_length'] * line['length'],
+      x=line['x_per_length'] * line['length'],
+      c=line['c_per_length'] * line['length'],
+      s_nom=line['s_nom'],
+      type=line['type'],
       capital_cost=line['capital_cost'],
-      length=line['length']
+      description=line['description']
       )
     print("Lines added successfully!\n")
+
+  def _add_transformers(self):
+    transformers_file = os.path.join(self.data_folder, 'transformers.csv')
+    transformers = pd.read_csv(transformers_file)
+    for _, transformer in transformers.iterrows():
+      self.network.add("Transformer", transformer['name'],
+      bus0=transformer['bus0'],
+      bus1=transformer['bus1'],
+      s_nom=transformer['s_nom'],
+      x=transformer['x_pu'],
+      r=transformer['r_pu'],
+      tap_position=transformer['tap_position'],
+      tap_min=transformer['tap_min'],
+      tap_max=transformer['tap_max'],
+      tap_step=transformer['tap_step'],
+      efficiency=transformer['efficiency'],
+      capital_cost=transformer['capital_cost'],
+      description=transformer['description']
+      )
 
   def get_network(self):
     if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
