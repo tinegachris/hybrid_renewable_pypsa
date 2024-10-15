@@ -3,3 +3,5 @@ AC_415,415,2.0,3.0,AC,1.0,0.95,1.05,PQ,1.02,0,A,load,200,-200,0,load_ac.csv,Main
 DC_1500,1500,-2.0,-1.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,storage,0,0,0,storage_dc.csv,Battery storage bus
 Hydro_11kV,11000,-5.0,3.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0,hydro_profile.csv,Hydro power generation bus
 Grid_33kV,33000,8.0,3.0,AC,1.0,0.95,1.05,Slack,1.0,0.01,B,grid,0,0,0,grid_profile.csv,Connection to national grid
+PV_DC_Bus,1000,-3.0,1.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,generator,0,0,0,pv_profile.csv,Solar PV DC connection bus
+AC_800,800,0.0,2.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,converter,100,-100,0,ac_800_profile.csv,Battery inverter AC output bus
