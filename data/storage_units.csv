@@ -1,2 +1,2 @@
 name,bus,p_nom,max_hours,efficiency_store,efficiency_dispatch,capital_cost,marginal_cost,p_min_pu,p_max_pu,cyclic_state_of_charge,state_of_charge_initial,state_of_charge_min,state_of_charge_max,description
-Battery_Storage,DC_1500,2000,2.5,0.95,0.95,500,0.01,-1.0,1.0,True,0.5,0.1,1.0,"5 MWh battery storage connected to DC bus"
+Battery_Storage,BAT_DC_1500,5000,2.5,0.95,0.95,500,0.01,-1.0,1.0,True,0.5,0.1,1.0,"5 MWh battery storage connected to the DC bus (1500 V)"
