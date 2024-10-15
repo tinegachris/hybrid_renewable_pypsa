@@ -12,6 +12,7 @@ class Network_Setup:
   def __init__(self, data_folder):
     self.data_folder = data_folder
     self.network = pypsa.Network()
+    self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="H"))
 
   def setup_network(self):
     self._add_buses()
@@ -90,7 +91,8 @@ class Network_Setup:
     for _, load in loads.iterrows():
       self.network.add("Load", load['name'],
       bus=load['bus'],
-      p_set=load['p_set'],
+      p_set=pd.Series([float(x) for x in load['p_set'].split(',')], index=self.network.snapshots),
+      q_set=pd.Series([float(x) for x in load['q_set'].split(',')], index=self.network.snapshots),
       p_min=load['p_min'],
       p_max=load['p_max'],
       scaling_factor=load['scaling_factor'],
