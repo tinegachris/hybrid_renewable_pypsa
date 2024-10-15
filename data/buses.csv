@@ -1,5 +1,5 @@
 name,v_nom,x,y,carrier,v_mag_pu_set,v_mag_pu_min,v_mag_pu_max,control,v_target,marginal_cost,zone,type,max_shunt_capacitor,min_shunt_capacitor,reactive_power_setpoint,load_profile,description
-AC_415,415,0.0,0.0,AC,1.0,0.95,1.05,PQ,1.02,0,A,load,200,-200,0,load_ac.csv,Main load and generation bus
-DC_1500,1500,0.0,0.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,storage,0,0,0,storage_dc.csv,Battery storage bus
-Hydro_11kV,11000,5.0,0.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0,hydro_profile.csv,Hydro power generation bus
-Grid_33kV,33000,10.0,0.0,AC,1.0,0.95,1.05,Slack,1.0,0.01,B,grid,0,0,0,grid_profile.csv,Connection to national grid
+AC_415,415,2.0,3.0,AC,1.0,0.95,1.05,PQ,1.02,0,A,load,200,-200,0,load_ac.csv,Main load and generation bus
+DC_1500,1500,-2.0,-1.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,storage,0,0,0,storage_dc.csv,Battery storage bus
+Hydro_11kV,11000,-5.0,3.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0,hydro_profile.csv,Hydro power generation bus
+Grid_33kV,33000,8.0,3.0,AC,1.0,0.95,1.05,Slack,1.0,0.01,B,grid,0,0,0,grid_profile.csv,Connection to national grid
