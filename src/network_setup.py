@@ -12,7 +12,7 @@ class Network_Setup:
   def __init__(self, data_folder):
     self.data_folder = data_folder
     self.network = pypsa.Network()
-    self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="H"))
+    self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="h"))
 
   def setup_network(self):
     self._add_buses()
@@ -20,6 +20,8 @@ class Network_Setup:
     self._add_storage_units()
     self._add_loads()
     self._add_lines()
+    self._add_transformers()
+    self._add_links()
     print("Network was setup successfully!\n")
 
   def _add_buses(self):
@@ -42,8 +44,7 @@ class Network_Setup:
       max_shunt_capacitor=row.get('max_shunt_capacitor', None),
       min_shunt_capacitor=row.get('min_shunt_capacitor', None),
       reactive_power_setpoint=row.get('reactive_power_setpoint', None),
-      load_profile=row.get('load_profile', None),
-      description=row.get('description', None)
+      load_profile=row.get('load_profile', None)
       )
     print("\nBuses added successfully!\n")
 
@@ -80,8 +81,7 @@ class Network_Setup:
       p_max_pu=row['p_max_pu'],
       cyclic_state_of_charge=row['cyclic_state_of_charge'],
       state_of_charge_min=row['state_of_charge_min'],
-      state_of_charge_max=row['state_of_charge_max'],
-      description=row['description']
+      state_of_charge_max=row['state_of_charge_max']
       )
     print("Storage units added successfully!\n")
 
@@ -116,8 +116,7 @@ class Network_Setup:
       c=line['c_per_length'] * line['length'],
       s_nom=line['s_nom'],
       type=line['type'],
-      capital_cost=line['capital_cost'],
-      description=line['description']
+      capital_cost=line['capital_cost']
       )
     print("Lines added successfully!\n")
 
@@ -136,9 +135,34 @@ class Network_Setup:
       tap_max=transformer['tap_max'],
       tap_step=transformer['tap_step'],
       efficiency=transformer['efficiency'],
-      capital_cost=transformer['capital_cost'],
-      description=transformer['description']
+      capital_cost=transformer['capital_cost']
       )
+    print("Transformers added successfully!\n")
+
+  def _add_links(self):
+    links_file = os.path.join(self.data_folder, 'links.csv')
+    links = pd.read_csv(links_file)
+    for _, link in links.iterrows():
+      self.network.add("Link", link['name'],
+      bus0=link['bus0'],
+      bus1=link['bus1'],
+      p_nom=link['p_nom'],
+      efficiency=link['efficiency'],
+      capital_cost=link['capital_cost'],
+      transformer_type=link['transformer_type'],
+      min_pu=link['min_pu'],
+      max_pu=link['max_pu'],
+      reactive_power_capacity=link['reactive_power_capacity'],
+      r=link['r'],
+      x=link['x'],
+      startup_cost=link['startup_cost'],
+      shutdown_cost=link['shutdown_cost'],
+      ramp_up=link['ramp_up'],
+      ramp_down=link['ramp_down'],
+      maintenance_cost=link['maintenance_cost'],
+      control_type=link['control_type']
+      )
+    print("Links added successfully!\n")
 
   def get_network(self):
     if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
@@ -164,6 +188,21 @@ class Network_Setup:
     if self.network.buses.empty:
       print("Warning: The buses DataFrame is empty.\n")
     return self.network.buses
+
+  def get_storage_units(self):
+    if self.network.storage_units.empty:
+      print("Warning: The storage units DataFrame is empty.\n")
+    return self.network.storage_units
+
+  def get_transformers(self):
+    if self.network.transformers.empty:
+      print("Warning: The transformers DataFrame is empty.\n")
+    return self.network.transformers
+
+  def get_links(self):
+    if self.network.links.empty:
+      print("Warning: The links DataFrame is empty.\n")
+    return self.network.links
 
   def get_time_series(self):
     if self.network.loads_t.p_set.empty:
@@ -200,3 +239,5 @@ if __name__ == "__main__":
   print(network.storage_units, "\n")
   print(network.loads, "\n")
   print(network.lines, "\n")
+  print(network.transformers, "\n")
+  print(network.links, "\n")
