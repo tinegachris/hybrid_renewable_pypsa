@@ -1,6 +1,6 @@
 import pypsa
 import pandas as pd
-from data_loader import DataLoader
+from data_loader import Data_Loader
 from logger_setup import LoggerSetup
 
 class Network_Setup:
@@ -14,7 +14,7 @@ class Network_Setup:
         self.data_folder = data_folder
         self.network = pypsa.Network()
         self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="h"))
-        self.data_loader = DataLoader(data_folder)
+        self.data_loader = Data_Loader(data_folder)
         self.logger = LoggerSetup.setup_logger('NetworkSetup')
 
     def setup_network(self):
