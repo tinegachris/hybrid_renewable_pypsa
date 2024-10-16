@@ -204,31 +204,6 @@ class Network_Setup:
       print("Warning: The links DataFrame is empty.\n")
     return self.network.links
 
-  def get_time_series(self):
-    if self.network.loads_t.p_set.empty:
-      print("Warning: The time series DataFrame is empty.\n")
-    return self.network.loads_t.p_set
-
-  def get_time_series_for_bus(self, bus_name):
-    if bus_name not in self.network.loads_t.p_set.columns:
-      print(f"Warning: No time series data for bus '{bus_name}'.\n")
-    return self.network.loads_t.p_set[bus_name]
-
-  def get_time_series_for_generator(self, generator_name):
-    if generator_name not in self.network.generators_t.p.columns:
-      print(f"Warning: No time series data for generator '{generator_name}'.\n")
-    return self.network.generators_t.p[generator_name]
-
-  def get_time_series_for_line(self, line_name):
-    if line_name not in self.network.lines_t.p0.columns:
-      print(f"Warning: No time series data for line '{line_name}'.\n")
-    return self.network.lines_t.p0[line_name]
-
-  def get_time_series_for_load(self, load_name):
-    if load_name not in self.network.loads_t.p.columns:
-      print(f"Warning: No time series data for load '{load_name}'.\n")
-    return self.network.loads_t.p[load_name]
-
 if __name__ == "__main__":
   data_folder = 'data'
   network_setup = Network_Setup(data_folder)
