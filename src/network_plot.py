@@ -3,7 +3,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from data_loader import Data_Loader
 from network_setup import Network_Setup
-from logger_setup import LoggerSetup
+from logger_setup import Logger_Setup
 
 class Network_Plot:
   def __init__(self, data_folder):
@@ -11,7 +11,7 @@ class Network_Plot:
       self.network_setup = Network_Setup(data_folder)
       self.network_setup.setup_network()
       self.network = self.network_setup.get_network()
-      self.logger = LoggerSetup.setup_logger('NetworkPlot')
+      self.logger = Logger_Setup.setup_logger('NetworkPlot')
 
   def plot_buses(self, ax):
     ax.scatter(
