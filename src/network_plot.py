@@ -39,6 +39,68 @@ class Network_Plot:
           #     transform=ccrs.PlateCarree(), fontsize=8, zorder=5, ha='center'
           # )
 
+  def plot_generators(self, ax):
+    for _, gen in self.network.generators.iterrows():
+      bus = self.network.buses.loc[gen.bus]
+      ax.plot(
+        bus.x, bus.y, marker='o', markersize=10, color='yellow',
+        transform=ccrs.PlateCarree(), zorder=5, label='Generators'
+      )
+      ax.text(
+        bus.x, bus.y, gen.name, transform=ccrs.PlateCarree(),
+        fontsize=8, zorder=5, ha='right'
+      )
+
+  def plot_loads(self, ax):
+    for _, load in self.network.loads.iterrows():
+      bus = self.network.buses.loc[load.bus]
+      ax.plot(
+        bus.x, bus.y, marker='o', markersize=10, color='black',
+        transform=ccrs.PlateCarree(), zorder=5, label='Loads'
+      )
+      ax.text(
+        bus.x, bus.y, load.name, transform=ccrs.PlateCarree(),
+        fontsize=8, zorder=5, ha='right'
+      )
+
+  def plot_transformers(self, ax):
+    for _, Transfomer in self.network.transformers.iterrows():
+      bus0 = self.network.buses.loc[Transfomer.bus0]
+      bus1 = self.network.buses.loc[Transfomer.bus1]
+      ax.plot(
+        [bus0.x, bus1.x], [bus0.y, bus1.y], transform=ccrs.PlateCarree(),
+        color='purple', linestyle='-', linewidth=1.5, zorder=1
+      )
+      ax.text(
+        0.5 * (bus0.x + bus1.x), 0.5 * (bus0.y + bus1.y), Transfomer.name,
+        transform=ccrs.PlateCarree(), fontsize=8, zorder=5, ha='center'
+      )
+
+  def plot_storage_units(self, ax):
+    for _, storage_unit in self.network.storage_units.iterrows():
+      bus = self.network.buses.loc[storage_unit.bus]
+      ax.plot(
+        bus.x, bus.y, marker='o', markersize=10, color='green',
+        transform=ccrs.PlateCarree(), zorder=5, label='Storage Units'
+      )
+      ax.text(
+        bus.x, bus.y, storage_unit.name, transform=ccrs.PlateCarree(),
+        fontsize=8, zorder=5, ha='right'
+      )
+
+  def plot_links(self, ax):
+    for _, link in self.network.links.iterrows():
+      bus0 = self.network.buses.loc[link.bus0]
+      bus1 = self.network.buses.loc[link.bus1]
+      ax.plot(
+        [bus0.x, bus1.x], [bus0.y, bus1.y], transform=ccrs.PlateCarree(),
+        color='brown', linestyle='-', linewidth=1.5, zorder=1
+      )
+      ax.text(
+        0.5 * (bus0.x + bus1.x), 0.5 * (bus0.y + bus1.y), link.name,
+        transform=ccrs.PlateCarree(), fontsize=8, zorder=5, ha='center'
+      )
+
   def add_map_features(self, ax):
     ax.add_feature(cfeature.LAND)
     ax.add_feature(cfeature.OCEAN)
@@ -53,7 +115,7 @@ class Network_Plot:
     """
     fig = plt.figure(figsize=(12, 12))
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-    self.add_map_features(ax)
+    #self.add_map_features(ax)
 
     ax.set_extent([
       self.network.buses.x.min() - 6, self.network.buses.x.max() + 6,
@@ -62,6 +124,11 @@ class Network_Plot:
 
     self.plot_buses(ax)
     self.plot_lines(ax)
+    self.plot_generators(ax)
+    self.plot_storage_units(ax)
+    self.plot_links(ax)
+    self.plot_transformers(ax)
+    self.plot_loads(ax)
 
     handles, labels = ax.get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
