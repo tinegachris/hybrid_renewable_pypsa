@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import networkx as nx
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from data_loader import Data_Loader
@@ -14,27 +13,7 @@ class Network_Plot:
       self.network = self.network_setup.get_network()
       self.logger = LoggerSetup.setup_logger('NetworkPlot')
 
-  def plot_network_nx(self):
-      """
-      Plot the network using the networkx library.
-      """
-      G = nx.Graph()
-
-      # Add nodes (buses)
-      for bus in self.network.buses.index:
-          G.add_node(bus)
-
-      # Add edges (lines)
-      for line in self.network.lines.itertuples():
-          G.add_edge(line.bus0, line.bus1)
-
-      # Draw the network
-      pos = nx.spring_layout(G)
-      nx.draw(G, pos, with_labels=True, node_size=500, node_color='lightblue')
-      plt.title('Network Topology')
-      plt.show()
-
-  def plot_network_ccrs(self):
+  def plot_network(self):
     """
     Plot the network using cartopy.
     """
@@ -49,8 +28,8 @@ class Network_Plot:
     ax.add_feature(cfeature.RIVERS)
 
     ax.set_extent([
-      self.network.buses.x.min() - 1, self.network.buses.x.max() + 1,
-      self.network.buses.y.min() - 1, self.network.buses.y.max() + 1
+      self.network.buses.x.min() - 2, self.network.buses.x.max() + 2,
+      self.network.buses.y.min() - 2, self.network.buses.y.max() + 2
     ])
 
     # Plot buses
@@ -61,7 +40,7 @@ class Network_Plot:
     for bus_name, bus in self.network.buses.iterrows():
       ax.text(
         bus.x, bus.y, bus_name, transform=ccrs.PlateCarree(),
-        fontsize=12, zorder=5, ha='right'
+        fontsize=8, zorder=5, ha='right'
       )
 
     # Plot lines
@@ -80,8 +59,7 @@ class Network_Plot:
 
   def main(self):
     self.logger.info('Plotting network...')
-    self.plot_network_nx()
-    self.plot_network_ccrs()
+    self.plot_network()
 
 if __name__ == '__main__':
     data_folder = 'data'
