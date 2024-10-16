@@ -13,7 +13,7 @@ class Network_Setup:
     def __init__(self, data_folder):
         self.data_folder = data_folder
         self.network = pypsa.Network()
-        self.network.set_snapshots(pd.date_range("2024-01-01", periods=24, freq="h"))
+        self.network.set_snapshots(pd.date_range("2024-10-01", periods=24, freq="h"))
         self.data_loader = Data_Loader(data_folder)
         self.logger = Logger_Setup.setup_logger('NetworkSetup')
 
