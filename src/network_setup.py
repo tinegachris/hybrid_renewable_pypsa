@@ -94,7 +94,6 @@ class Network_Setup:
             x_per_length=0.0,
             c_per_length=0.0,
             s_nom=0.0,
-            type='',
             capital_cost=0.0
         )
 
