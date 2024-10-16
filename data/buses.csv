@@ -1,9 +1,14 @@
-name,v_nom,x,y,carrier,v_mag_pu_set,v_mag_pu_min,v_mag_pu_max,control,v_target,marginal_cost,zone,type,max_shunt_capacitor,min_shunt_capacitor,reactive_power_setpoint,load_profile,description
-AC_415,415,0.0,0.0,AC,1.0,0.95,1.05,PQ,1.02,0,A,load,200,-200,0,load_ac.csv,Main load and generation bus
-BAT_DC_1500,1500,0.0,-6.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,storage,0,0,0,storage_dc.csv,Battery storage bus
-Hydro_AC_11kV,11000,6.0,0.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0,hydro_profile.csv,Hydro power generation bus
-Hydro_AC_415,415,6.0,-3.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0,hydro_profile.csv,Hydro power generation bus
-Grid_AC_33kV,33000,-10.0,0.0,AC,1.0,0.95,1.05,Slack,1.0,0.01,B,grid,0,0,0,grid_profile.csv,Connection to national grid
-PV_DC_1000,1000,-5.0,-5.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,generator,0,0,0,pv_profile.csv,Solar PV DC connection bus
-BAT_AC_800,800,0.0,-3.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,converter,100,-100,0,ac_800_profile.csv,Battery inverter AC output bus
-Load_AC_Bus,415,0.0,3.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,load,0,0,0,load_ac.csv,Load bus connected to the AC 415 bus
+name,v_nom,x,y,carrier,v_mag_pu_set,v_mag_pu_min,v_mag_pu_max,control,v_target,marginal_cost,zone,type,max_shunt_capacitor,min_shunt_capacitor,reactive_power_setpoint
+Main_AC_415V,415,0.0,0.0,AC,1.0,0.95,1.05,PQ,1.02,0,A,load,200,-200,0
+Load_AC_415V,415,0.0,6.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,load,0,0,0
+Grid_IN_AC_33kV,33000,-8.0,4.0,AC,1.0,0.95,1.05,Slack,1.0,0.01,A,grid,0,0,0
+Grid_IN_AC_415V,415,-6.0,0.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,grid,0,0,0
+Hydro_IN_AC_415V,415,6.0,0.0,AC,1.0,0.95,1.05,PV,1.0,0.005,B,generator,100,-100,0
+Hydro_IN_AC_11kV,11000,9.0,6.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0
+Hydro_OUT_AC_11kV,11000,12.0,3.0,AC,1.0,0.95,1.05,PV,1.0,0.005,B,generator,100,-100,0
+Hydro_OUT_AC_415V,415,12.0,-3.0,AC,1.0,0.95,1.05,PV,1.0,0.005,B,generator,100,-100,0
+BAT_AC_415V,415,0.0,-6.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,converter,100,-100,0
+BAT_AC_800V,800,0.0,-12.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,converter,100,-100,0
+BAT_DC_1500V,1500,0.0,-18.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,storage,0,0,0
+PV_AC_415V,415,-6.0,-6.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,generator,0,0,0
+PV_DC_1000V,1000,-12.0,-12.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,generator,0,0,0

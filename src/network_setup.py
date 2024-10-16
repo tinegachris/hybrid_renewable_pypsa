@@ -1,6 +1,6 @@
 import pypsa
 import pandas as pd
-from data_loader import DataLoader
+from data_loader import Data_Loader
 from logger_setup import LoggerSetup
 
 class Network_Setup:
@@ -14,7 +14,7 @@ class Network_Setup:
         self.data_folder = data_folder
         self.network = pypsa.Network()
         self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="h"))
-        self.data_loader = DataLoader(data_folder)
+        self.data_loader = Data_Loader(data_folder)
         self.logger = LoggerSetup.setup_logger('NetworkSetup')
 
     def setup_network(self):
@@ -158,41 +158,6 @@ class Network_Setup:
         if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
             self.logger.warning("The network is empty.")
         return self.network
-
-    def get_generators(self):
-        if self.network.generators.empty:
-            self.logger.warning("The generators DataFrame is empty.")
-        return self.network.generators
-
-    def get_loads(self):
-        if self.network.loads.empty:
-            self.logger.warning("The loads DataFrame is empty.")
-        return self.network.loads
-
-    def get_lines(self):
-        if self.network.lines.empty:
-            self.logger.warning("The lines DataFrame is empty.")
-        return self.network.lines
-
-    def get_buses(self):
-        if self.network.buses.empty:
-            self.logger.warning("The buses DataFrame is empty.")
-        return self.network.buses
-
-    def get_storage_units(self):
-        if self.network.storage_units.empty:
-            self.logger.warning("The storage units DataFrame is empty.")
-        return self.network.storage_units
-
-    def get_transformers(self):
-        if self.network.transformers.empty:
-            self.logger.warning("The transformers DataFrame is empty.")
-        return self.network.transformers
-
-    def get_links(self):
-        if self.network.links.empty:
-            self.logger.warning("The links DataFrame is empty.")
-        return self.network.links
 
 def main():
     data_folder = 'data'
