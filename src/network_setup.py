@@ -1,11 +1,11 @@
 import pypsa
 import pandas as pd
 from data_loader import Data_Loader
-from logger_setup import LoggerSetup
+from logger_setup import Logger_Setup
 
 class Network_Setup:
     """
-    NetworkSetup class for setting up and managing a PyPSA network.
+    Network_Setup class for setting up and managing a PyPSA network.
     Attributes:
         data_folder (str): Path to the folder containing network data files.
         network (pypsa.Network): Instance of the PyPSA Network.
@@ -15,7 +15,7 @@ class Network_Setup:
         self.network = pypsa.Network()
         self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="h"))
         self.data_loader = Data_Loader(data_folder)
-        self.logger = LoggerSetup.setup_logger('NetworkSetup')
+        self.logger = Logger_Setup.setup_logger('NetworkSetup')
 
     def setup_network(self):
         self._add_buses()
@@ -164,7 +164,7 @@ def main():
     network_setup = Network_Setup(data_folder)
     network_setup.setup_network()
     network = network_setup.get_network()
-    logger = LoggerSetup.setup_logger('Main')
+    logger = Logger_Setup.setup_logger('Main')
     logger.info(network.buses)
     logger.info(network.generators)
     logger.info(network.storage_units)

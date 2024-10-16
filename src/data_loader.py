@@ -1,11 +1,11 @@
 import pandas as pd
 import os
-from logger_setup import LoggerSetup
+from logger_setup import Logger_Setup
 
 class Data_Loader:
     def __init__(self, data_folder):
         self.data_folder = data_folder
-        self.logger = LoggerSetup.setup_logger('DataLoader')
+        self.logger = Logger_Setup.setup_logger('DataLoader')
 
     def _sanitize_file_name(self, file_name):
         allowed_files = {'buses.csv', 'generators.csv', 'storage_units.csv', 'loads.csv', 'lines.csv', 'transformers.csv', 'links.csv'}
