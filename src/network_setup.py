@@ -1,15 +1,7 @@
 import pypsa
 import pandas as pd
-import os
-import logging
-
-logger = logging.getLogger('NetworkSetup')
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.propagate = False
+from data_loader import DataLoader
+from logger_setup import LoggerSetup
 
 class Network_Setup:
     """
@@ -22,6 +14,8 @@ class Network_Setup:
         self.data_folder = data_folder
         self.network = pypsa.Network()
         self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="h"))
+        self.data_loader = DataLoader(data_folder)
+        self.logger = LoggerSetup.setup_logger('NetworkSetup')
 
     def setup_network(self):
         self._add_buses()
@@ -31,39 +25,16 @@ class Network_Setup:
         self._add_transformers()
         self._add_links()
         self._add_loads()
-        logger.info("Network was setup successfully!")
-
-    def _sanitize_file_name(self, file_name):
-        allowed_files = {'buses.csv', 'generators.csv', 'storage_units.csv', 'loads.csv', 'lines.csv', 'transformers.csv', 'links.csv'}
-        if file_name not in allowed_files:
-            raise ValueError(f"Invalid file name: {file_name}")
-        return file_name
-
-    def _read_csv(self, file_name):
-        try:
-            sanitized_file_name = self._sanitize_file_name(file_name)
-            file_path = os.path.join(self.data_folder, sanitized_file_name)
-            return pd.read_csv(file_path)
-        except ValueError as ve:
-            logger.error(ve)
-        except FileNotFoundError:
-            logger.error(f"File {file_name} not found in the data folder.")
-        except pd.errors.EmptyDataError:
-            logger.error(f"File {file_name} is empty.")
-        except Exception as e:
-            logger.error(f"An error occurred while reading file {file_name}.")
-            logger.error(e)
-        return pd.DataFrame()
+        self.logger.info("Network was setup successfully!")
 
     def _add_component(self, component_type, data_file, **kwargs):
-        data = self._read_csv(data_file)
+        data = self.data_loader.read_csv(data_file)
         if not data.empty:
             for _, row in data.iterrows():
                 self.network.add(component_type, row['name'], **{key: row.get(key, kwargs[key]) for key in kwargs})
-            logger.info(f"{component_type} added successfully!")
+            self.logger.info(f"{component_type} added successfully!")
         else:
-            logger.warning(f"No {component_type} were added to the network.")
-
+            self.logger.warning(f"No {component_type} were added to the network.")
 
     def _add_buses(self):
         self._add_component("Bus", 'buses.csv',
@@ -164,9 +135,9 @@ class Network_Setup:
         )
 
     def _add_loads(self):
-        loads = self._read_csv('loads.csv')
+        loads = self.data_loader.read_csv('loads.csv')
         if loads.empty:
-            logger.warning("No loads were added to the network.")
+            self.logger.warning("No loads were added to the network.")
             return
         for _, load in loads.iterrows():
             self.network.add("Load", load['name'],
@@ -181,46 +152,46 @@ class Network_Setup:
             response_time=load.get('response_time', 0.0),
             priority=load.get('priority', 0)
             )
-        logger.info("Loads added successfully!")
+        self.logger.info("Loads added successfully!")
 
     def get_network(self):
         if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
-            logger.warning("The network is empty.")
+            self.logger.warning("The network is empty.")
         return self.network
 
     def get_generators(self):
         if self.network.generators.empty:
-            logger.warning("The generators DataFrame is empty.")
+            self.logger.warning("The generators DataFrame is empty.")
         return self.network.generators
 
     def get_loads(self):
         if self.network.loads.empty:
-            logger.warning("The loads DataFrame is empty.")
+            self.logger.warning("The loads DataFrame is empty.")
         return self.network.loads
 
     def get_lines(self):
         if self.network.lines.empty:
-            logger.warning("The lines DataFrame is empty.")
+            self.logger.warning("The lines DataFrame is empty.")
         return self.network.lines
 
     def get_buses(self):
         if self.network.buses.empty:
-            logger.warning("The buses DataFrame is empty.")
+            self.logger.warning("The buses DataFrame is empty.")
         return self.network.buses
 
     def get_storage_units(self):
         if self.network.storage_units.empty:
-            logger.warning("The storage units DataFrame is empty.")
+            self.logger.warning("The storage units DataFrame is empty.")
         return self.network.storage_units
 
     def get_transformers(self):
         if self.network.transformers.empty:
-            logger.warning("The transformers DataFrame is empty.")
+            self.logger.warning("The transformers DataFrame is empty.")
         return self.network.transformers
 
     def get_links(self):
         if self.network.links.empty:
-            logger.warning("The links DataFrame is empty.")
+            self.logger.warning("The links DataFrame is empty.")
         return self.network.links
 
 def main():
@@ -228,13 +199,14 @@ def main():
     network_setup = Network_Setup(data_folder)
     network_setup.setup_network()
     network = network_setup.get_network()
+    logger = LoggerSetup.setup_logger('Main')
     logger.info(network.buses)
     logger.info(network.generators)
     logger.info(network.storage_units)
+    logger.info(network.loads)
     logger.info(network.lines)
     logger.info(network.transformers)
     logger.info(network.links)
-    logger.info(network.loads)
 
 if __name__ == "__main__":
     main()
