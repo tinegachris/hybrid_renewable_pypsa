@@ -13,22 +13,36 @@ class Network_Analysis:
       network_setup (Network_Setup): Instance of the Network_Setup class.
   """
   def __init__(self, data_folder):
-      self.network_setup = Network_Setup(data_folder)
-      self.logger = Logger_Setup.setup_logger('NetworkAnalysis')
+    self.data_loader = Data_Loader(data_folder)
+    self.network_setup = Network_Setup(data_folder)
+    self.network_setup.setup_network()
+    self.network = self.network_setup.get_network()
+    self.logger = Logger_Setup.setup_logger('NetworkAnalysis')
 
   def analyze_network(self):
-      self.network_setup.setup_network()
-      self._run_pf()
-      self._run_opf()
-      self._run_storage_analysis()
-      self._run_reliability_analysis()
-      self._run_load_shift_analysis()
-      self._run_losses_analysis()
+    self.logger.info("Analyzing network...")
+    #self._run_consistency_check()
+    self._run_pf()
+    # self._run_opf()
+    # self._run_storage_analysis()
+    # self._run_reliability_analysis()
+    # self._run_load_shift_analysis()
+    # self._run_losses_analysis()
+
+  def _run_consistency_check(self):
+    """
+    Check the consistency of the network.
+    """
+    self.logger.info("Running consistency check...")
+    self.network.consistency_check()
+    self.logger.info("Consistency check completed successfully!")
+
 
   def _run_pf(self):
     """
     Determine voltage, current, and power flows in each line, and voltages at each bus under steady-state conditions.
     """
+    snapshots = pd.date_range("2024-10-01", periods=24, freq="h")
     self.logger.info("Running Power Flow analysis...")
     self.network_setup.network.pf()
     self.logger.info("Power Flow analysis completed successfully!")
