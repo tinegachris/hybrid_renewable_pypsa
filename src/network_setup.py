@@ -53,7 +53,17 @@ class Network_Setup:
         except Exception as e:
             logger.error(f"An error occurred while reading file {file_name}.")
             logger.error(e)
-        return pd.DataFrame() # Return an empty DataFrame if an error occurs
+        return pd.DataFrame()
+
+    def _add_component(self, component_type, data_file, **kwargs):
+        data = self._read_csv(data_file)
+        if not data.empty:
+            for _, row in data.iterrows():
+                self.network.add(component_type, row['name'], **{key: row.get(key) for key in kwargs})
+            logger.info(f"{component_type} added successfully!")
+        else:
+            logger.warning(f"No {component_type} were added to the network.")
+
 
     def _add_buses(self):
         buses = self._read_csv('buses.csv')
