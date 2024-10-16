@@ -34,10 +34,10 @@ class Network_Plot:
               [bus0.x, bus1.x], [bus0.y, bus1.y], transform=ccrs.PlateCarree(),
               color=line_color, linestyle=line_style, linewidth=1.5, zorder=1
           )
-          # ax.text(
-          #     0.5 * (bus0.x + bus1.x), 0.5 * (bus0.y + bus1.y), line.name,
-          #     transform=ccrs.PlateCarree(), fontsize=8, zorder=5, ha='center'
-          # )
+          ax.text(
+              0.5 * (bus0.x + bus1.x), 0.5 * (bus0.y + bus1.y), line.name,
+              transform=ccrs.PlateCarree(), fontsize=8, zorder=5, ha='center'
+          )
 
   def plot_generators(self, ax):
     for _, gen in self.network.generators.iterrows():
@@ -48,7 +48,7 @@ class Network_Plot:
       )
       ax.text(
         bus.x, bus.y, gen.name, transform=ccrs.PlateCarree(),
-        fontsize=8, zorder=5, ha='right'
+        fontsize=8, zorder=5, ha='left'
       )
 
   def plot_loads(self, ax):
@@ -60,7 +60,7 @@ class Network_Plot:
       )
       ax.text(
         bus.x, bus.y, load.name, transform=ccrs.PlateCarree(),
-        fontsize=8, zorder=5, ha='right'
+        fontsize=8, zorder=5, ha='left'
       )
 
   def plot_transformers(self, ax):
