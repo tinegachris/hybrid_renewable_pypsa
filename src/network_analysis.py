@@ -77,9 +77,10 @@ class Network_Analysis:
     self.logger.info(f"Transformer losses: {transformer_losses.sum().sum()}")
     self.logger.info(f"Total losses: {line_losses.sum().sum() + bus_losses.sum() + transformer_losses.sum().sum()}")
 
-  def main(data_folder, output_file):
-      network_analysis = Network_Analysis(data_folder)
-      network_analysis.analyze_network()
+  def main(data_folder):
+    data_folder = 'data'
+    network_analysis = Network_Analysis(data_folder)
+    network_analysis.analyze_network()
 
 if __name__ == '__main__':
     data_folder = 'data'
