@@ -33,10 +33,19 @@ class Network_Setup:
         self._add_links()
         logger.info("Network was setup successfully!")
 
+    def _sanitize_file_name(self, file_name):
+        allowed_files = {'buses.csv', 'generators.csv', 'storage_units.csv', 'loads.csv', 'lines.csv', 'transformers.csv', 'links.csv'}
+        if file_name not in allowed_files:
+            raise ValueError(f"Invalid file name: {file_name}")
+        return file_name
+
     def _read_csv(self, file_name):
-        file_path = os.path.join(self.data_folder, file_name)
         try:
+            sanitized_file_name = self._sanitize_file_name(file_name)
+            file_path = os.path.join(self.data_folder, sanitized_file_name)
             return pd.read_csv(file_path)
+        except ValueError as ve:
+            logger.error(ve)
         except FileNotFoundError:
             logger.error(f"File {file_name} not found in the data folder.")
         except pd.errors.EmptyDataError:
