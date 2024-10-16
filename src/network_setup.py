@@ -94,7 +94,8 @@ class Network_Setup:
             x_per_length=0.0,
             c_per_length=0.0,
             s_nom=0.0,
-            capital_cost=0.0
+            capital_cost=0.0,
+            carrier='AC'
         )
 
     def _add_transformers(self):
@@ -120,8 +121,8 @@ class Network_Setup:
             efficiency=0.0,
             capital_cost=0.0,
             transformer_type='',
-            min_pu=0.0,
-            max_pu=0.0,
+            p_min_pu=0.0,
+            p_max_pu=0.0,
             reactive_power_capacity=0.0,
             r=0.0,
             x=0.0,
@@ -130,6 +131,7 @@ class Network_Setup:
             ramp_up=0.0,
             ramp_down=0.0,
             maintenance_cost=0.0,
+            status=True,
             control_type=''
         )
 
@@ -146,10 +148,8 @@ class Network_Setup:
             p_min=load.get('p_min', 0.0),
             p_max=load.get('p_max', 0.0),
             scaling_factor=load.get('scaling_factor', 1.0),
-            status=load.get('status', True),
-            control_type=load.get('control_type', ''),
-            response_time=load.get('response_time', 0.0),
-            priority=load.get('priority', 0)
+            status=load.get('active', True),
+            carrier=load.get('carrier', 'AC'),
             )
         self.logger.info("Loads added successfully!")
 
