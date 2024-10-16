@@ -17,6 +17,11 @@ class Network_Setup:
         self.data_loader = Data_Loader(data_folder)
         self.logger = Logger_Setup.setup_logger('NetworkSetup')
 
+        # Define necessary carriers for buses, lines, and links
+        self.network.add("Carrier", "AC")
+        self.network.add("Carrier", "DC")
+        self.network.add("Carrier", "electricity")
+
     def setup_network(self):
         self._add_buses()
         self._add_generators()
@@ -85,17 +90,25 @@ class Network_Setup:
         )
 
     def _add_lines(self):
-        self._add_component("Line", 'lines.csv',
-            bus0='',
-            bus1='',
-            length=0.0,
-            r_per_length=0.0,
-            x_per_length=0.0,
-            c_per_length=0.0,
-            s_nom=0.0,
-            capital_cost=0.0,
-            carrier=''
-        )
+        data = self.data_loader.read_csv('lines.csv')
+        if not data.empty:
+            for _, row in data.iterrows():
+                self.network.add("Line", row['name'],
+                    bus0=row.get('bus0', ''),
+                    bus1=row.get('bus1', ''),
+                    length=row.get('length', 0.0),
+                    r_per_length=row.get('r_per_length', 0.0),
+                    x_per_length=row.get('x_per_length', 0.0),
+                    c_per_length=row.get('c_per_length', 0.0),
+                    s_nom=row.get('s_nom', 0.0),
+                    x=row['x_per_length']*row['length'],
+                    r=row['r_per_length']*row['length'],
+                    capital_cost=row.get('capital_cost', 0.0),
+                    carrier=row.get('carrier', '')
+                )
+            self.logger.info("Lines added successfully!\n")
+        else:
+            self.logger.warning("No lines were added to the network.")
 
     def _add_transformers(self):
         self._add_component("Transformer", 'transformers.csv',
