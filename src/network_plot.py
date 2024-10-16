@@ -13,26 +13,7 @@ class Network_Plot:
       self.network = self.network_setup.get_network()
       self.logger = LoggerSetup.setup_logger('NetworkPlot')
 
-  def plot_network(self):
-    """
-    Plot the network using cartopy.
-    """
-    fig = plt.figure(figsize=(12, 12))
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-
-    ax.add_feature(cfeature.LAND)
-    ax.add_feature(cfeature.OCEAN)
-    ax.add_feature(cfeature.COASTLINE)
-    ax.add_feature(cfeature.BORDERS, linestyle=':')
-    ax.add_feature(cfeature.LAKES, alpha=0.5)
-    ax.add_feature(cfeature.RIVERS)
-
-    ax.set_extent([
-      self.network.buses.x.min() - 2, self.network.buses.x.max() + 2,
-      self.network.buses.y.min() - 2, self.network.buses.y.max() + 2
-    ])
-
-    # Plot buses
+  def plot_buses(self, ax):
     ax.scatter(
       self.network.buses.x, self.network.buses.y, transform=ccrs.PlateCarree(),
       s=200, color='red', zorder=5, label='Buses'
@@ -43,7 +24,7 @@ class Network_Plot:
         fontsize=8, zorder=5, ha='right'
       )
 
-    # Plot lines
+  def plot_lines(self, ax):
     for _, line in self.network.lines.iterrows():
       bus0 = self.network.buses.loc[line.bus0]
       bus1 = self.network.buses.loc[line.bus1]
@@ -52,10 +33,36 @@ class Network_Plot:
         color='black', zorder=1, label='Lines' if _ == 0 else ""
       )
 
+  def add_map_features(self, ax):
+    ax.add_feature(cfeature.LAND)
+    ax.add_feature(cfeature.OCEAN)
+    ax.add_feature(cfeature.COASTLINE)
+    ax.add_feature(cfeature.BORDERS, linestyle=':')
+    ax.add_feature(cfeature.LAKES, alpha=0.5)
+    ax.add_feature(cfeature.RIVERS)
+
+  def plot_network(self):
+    """
+    Plot the network
+    """
+    fig = plt.figure(figsize=(12, 12))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    self.add_map_features(ax)
+
+    ax.set_extent([
+      self.network.buses.x.min() - 2, self.network.buses.x.max() + 2,
+      self.network.buses.y.min() - 2, self.network.buses.y.max() + 2
+    ])
+
+    self.plot_buses(ax)
+    self.plot_lines(ax)
+
     handles, labels = ax.get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
     ax.legend(by_label.values(), by_label.keys())
     plt.show()
+
+
 
   def main(self):
     self.logger.info('Plotting network...')
