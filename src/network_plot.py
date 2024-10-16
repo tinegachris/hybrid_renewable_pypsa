@@ -80,7 +80,7 @@ class Network_Plot:
 
   def main(self):
     self.logger.info('Plotting network...')
-    #self.plot_network_nx()
+    self.plot_network_nx()
     self.plot_network_ccrs()
 
 if __name__ == '__main__':
