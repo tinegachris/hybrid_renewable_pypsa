@@ -9,6 +9,7 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+logger.propagate = False
 
 class Network_Setup:
     """
@@ -46,8 +47,10 @@ class Network_Setup:
         return pd.DataFrame() # Return an empty DataFrame if an error occurs
 
     def _add_buses(self):
-        buses_file = os.path.join(self.data_folder, 'buses.csv')
-        buses = pd.read_csv(buses_file)
+        buses = self._read_csv('buses.csv')
+        if buses.empty:
+            logger.warning("No buses were added to the network.")
+            return
         for _, row in buses.iterrows():
             self.network.add("Bus", row['name'],
             v_nom=row['v_nom'],
@@ -70,8 +73,10 @@ class Network_Setup:
         logger.info("Buses added successfully!")
 
     def _add_generators(self):
-        generators_file = os.path.join(self.data_folder, 'generators.csv')
-        generators = pd.read_csv(generators_file)
+        generators = self._read_csv('generators.csv')
+        if generators.empty:
+            logger.warning("No generators were added to the network.")
+            return
         for _, row in generators.iterrows():
             self.network.add("Generator", row['name'],
             bus=row['bus'],
@@ -86,8 +91,10 @@ class Network_Setup:
         logger.info("Generators added successfully!")
 
     def _add_storage_units(self):
-        storage_units_file = os.path.join(self.data_folder, 'storage_units.csv')
-        storage_units = pd.read_csv(storage_units_file)
+        storage_units = self._read_csv('storage_units.csv')
+        if storage_units.empty:
+            logger.warning("No storage units were added to the network.")
+            return
         for _, row in storage_units.iterrows():
             self.network.add("StorageUnit", row['name'],
             bus=row['bus'],
@@ -107,8 +114,10 @@ class Network_Setup:
         logger.info("Storage units added successfully!")
 
     def _add_loads(self):
-        loads_file = os.path.join(self.data_folder, 'loads.csv')
-        loads = pd.read_csv(loads_file)
+        loads = self._read_csv('loads.csv')
+        if loads.empty:
+            logger.warning("No loads were added to the network.")
+            return
         for _, load in loads.iterrows():
             self.network.add("Load", load['name'],
             bus=load['bus'],
@@ -125,8 +134,10 @@ class Network_Setup:
         logger.info("Loads added successfully!")
 
     def _add_lines(self):
-        lines_file = os.path.join(self.data_folder, 'lines.csv')
-        lines = pd.read_csv(lines_file)
+        lines = self._read_csv('lines.csv')
+        if lines.empty:
+            logger.warning("No lines were added to the network.")
+            return
         for _, line in lines.iterrows():
             self.network.add("Line", line['name'],
             bus0=line['bus0'],
@@ -142,8 +153,10 @@ class Network_Setup:
         logger.info("Lines added successfully!")
 
     def _add_transformers(self):
-        transformers_file = os.path.join(self.data_folder, 'transformers.csv')
-        transformers = pd.read_csv(transformers_file)
+        transformers = self._read_csv('transformers.csv')
+        if transformers.empty:
+            logger.warning("No transformers were added to the network.")
+            return
         for _, transformer in transformers.iterrows():
             self.network.add("Transformer", transformer['name'],
             bus0=transformer['bus0'],
@@ -161,8 +174,10 @@ class Network_Setup:
         logger.info("Transformers added successfully!")
 
     def _add_links(self):
-        links_file = os.path.join(self.data_folder, 'links.csv')
-        links = pd.read_csv(links_file)
+        links = self._read_csv('links.csv')
+        if links.empty:
+            logger.warning("No links were added to the network.")
+            return
         for _, link in links.iterrows():
             self.network.add("Link", link['name'],
             bus0=link['bus0'],
