@@ -25,13 +25,19 @@ class Network_Plot:
       )
 
   def plot_lines(self, ax):
-    for _, line in self.network.lines.iterrows():
-      bus0 = self.network.buses.loc[line.bus0]
-      bus1 = self.network.buses.loc[line.bus1]
-      ax.plot(
-        [bus0.x, bus1.x], [bus0.y, bus1.y], transform=ccrs.PlateCarree(),
-        color='black', zorder=1, label='Lines' if _ == 0 else ""
-      )
+      for _, line in self.network.lines.iterrows():
+          bus0 = self.network.buses.loc[line.bus0]
+          bus1 = self.network.buses.loc[line.bus1]
+          line_color = 'black' if line.s_nom > 100 else 'gray'
+          line_style = '--' if line.type == 'MV_line' else '-'
+          ax.plot(
+              [bus0.x, bus1.x], [bus0.y, bus1.y], transform=ccrs.PlateCarree(),
+              color=line_color, linestyle=line_style, linewidth=1.5, zorder=1
+          )
+          # ax.text(
+          #     0.5 * (bus0.x + bus1.x), 0.5 * (bus0.y + bus1.y), line.name,
+          #     transform=ccrs.PlateCarree(), fontsize=8, zorder=5, ha='center'
+          # )
 
   def add_map_features(self, ax):
     ax.add_feature(cfeature.LAND)
@@ -50,8 +56,8 @@ class Network_Plot:
     self.add_map_features(ax)
 
     ax.set_extent([
-      self.network.buses.x.min() - 2, self.network.buses.x.max() + 2,
-      self.network.buses.y.min() - 2, self.network.buses.y.max() + 2
+      self.network.buses.x.min() - 6, self.network.buses.x.max() + 6,
+      self.network.buses.y.min() - 6, self.network.buses.y.max() + 6
     ])
 
     self.plot_buses(ax)
@@ -65,7 +71,7 @@ class Network_Plot:
 
 
   def main(self):
-    self.logger.info('Plotting network...')
+    self.logger.info(f'Plotting {len(self.network.buses)} buses and {len(self.network.lines)} lines...')
     self.plot_network()
 
 if __name__ == '__main__':
