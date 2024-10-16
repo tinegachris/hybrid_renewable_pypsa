@@ -204,15 +204,18 @@ class Network_Setup:
       print("Warning: The links DataFrame is empty.\n")
     return self.network.links
 
+def main():
+    data_folder = 'data'
+    network_setup = Network_Setup(data_folder)
+    network_setup.setup_network()
+    network = network_setup.get_network()
+    print(network.buses, "\n")
+    print(network.generators, "\n")
+    print(network.storage_units, "\n")
+    print(network.loads, "\n")
+    print(network.lines, "\n")
+    print(network.transformers, "\n")
+    print(network.links, "\n")
+
 if __name__ == "__main__":
-  data_folder = 'data'
-  network_setup = Network_Setup(data_folder)
-  network_setup.setup_network()
-  network = network_setup.get_network()
-  print(network.buses, "\n")
-  print(network.generators, "\n")
-  print(network.storage_units, "\n")
-  print(network.loads, "\n")
-  print(network.lines, "\n")
-  print(network.transformers, "\n")
-  print(network.links, "\n")
+    main()
