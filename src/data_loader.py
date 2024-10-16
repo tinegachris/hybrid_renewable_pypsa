@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from logger_setup import LoggerSetup
 
-class DataLoader:
+class Data_Loader:
     def __init__(self, data_folder):
         self.data_folder = data_folder
         self.logger = LoggerSetup.setup_logger('DataLoader')
