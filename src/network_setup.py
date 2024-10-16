@@ -13,7 +13,7 @@ class Network_Setup:
     def __init__(self, data_folder):
         self.data_folder = data_folder
         self.network = pypsa.Network()
-        self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="h"))
+        self.network.set_snapshots(pd.date_range("2024-01-01", periods=24, freq="h"))
         self.data_loader = Data_Loader(data_folder)
         self.logger = Logger_Setup.setup_logger('NetworkSetup')
 
@@ -25,14 +25,14 @@ class Network_Setup:
         self._add_transformers()
         self._add_links()
         self._add_loads()
-        self.logger.info("Network was setup successfully!")
+        self.logger.info("Network was setup successfully!\n")
 
     def _add_component(self, component_type, data_file, **kwargs):
         data = self.data_loader.read_csv(data_file)
         if not data.empty:
             for _, row in data.iterrows():
                 self.network.add(component_type, row['name'], **{key: row.get(key, kwargs[key]) for key in kwargs})
-            self.logger.info(f"{component_type} added successfully!")
+            self.logger.info(f"{component_type} added successfully!\n")
         else:
             self.logger.warning(f"No {component_type} were added to the network.")
 
@@ -52,8 +52,7 @@ class Network_Setup:
             type='',
             max_shunt_capacitor=0.0,
             min_shunt_capacitor=0.0,
-            reactive_power_setpoint=0.0,
-            load_profile=''
+            reactive_power_setpoint=0.0
         )
 
     def _add_generators(self):
@@ -95,7 +94,7 @@ class Network_Setup:
             c_per_length=0.0,
             s_nom=0.0,
             capital_cost=0.0,
-            carrier='AC'
+            carrier=''
         )
 
     def _add_transformers(self):
@@ -149,13 +148,13 @@ class Network_Setup:
             p_max=load.get('p_max', 0.0),
             scaling_factor=load.get('scaling_factor', 1.0),
             status=load.get('active', True),
-            carrier=load.get('carrier', 'AC'),
+            carrier=load.get('carrier', ''),
             )
-        self.logger.info("Loads added successfully!")
+        self.logger.info("Loads added successfully!\n")
 
     def get_network(self):
         if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
-            self.logger.warning("The network is empty.")
+            self.logger.warning("The network is empty.\n")
         return self.network
 
 def main():
