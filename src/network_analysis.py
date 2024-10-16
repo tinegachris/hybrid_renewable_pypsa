@@ -1,55 +1,50 @@
+import pypsa
 import pandas as pd
 import numpy as np
 
 from network_setup import Network_Setup
+from data_loader import Data_Loader
+from logger_setup import Logger_Setup
 
-class NetworkAnalysis:
-  """
-  NetworkAnalysis class for analyzing a PyPSA network.
-  Attributes:
-    network (pypsa.Network): Instance of the PyPSA Network.
-  """
-  def __init__(self, network):
-    self.network_setup = Network_Setup(data_folder)
-    self.network_setup.setup_network()
-    self.network = self.network_setup.get_network()
-
-  def analyze_network(self):
-    self._analyze_buses()
-    self._analyze_generators()
-    self._analyze_storage_units()
-    self._analyze_lines()
-    self._analyze_loads()
-
-  def _analyze_buses(self):
-    buses = self.network_setup.get_buses()
-    print(buses, "\n")
-
-  def _analyze_generators(self):
-    generators = self.network_setup.get_generators()
-    print(generators, "\n")
-
-  def _analyze_storage_units(self):
-    storage_units = self.network_setup.get_storage_units()
-    print(storage_units, "\n")
-
-  def _analyze_lines(self):
-    lines = self.network_setup.get_lines()
-    print(lines, "\n")
-
-  def _analyze_loads(self):
-    loads = self.network_setup.get_loads()
-    print(loads, "\n")
-
-  def _analyze_power_flows(self):
-    """Perform Newton-Raphson power flow analysis on the network.
+class Network_Analysis:
     """
-    power_flows = self.network.pf()
-    self.network.lines_t.p0
-    self.network.buses_t.v_ang * 180 / np.pi
-    self.network.buses_t.v_mag_pu
+    Network_Analysis class for analyzing a PyPSA network.
+    Attributes:
+        network_setup (Network_Setup): Instance of the Network_Setup class.
+    """
+    def __init__(self, data_folder):
+        self.network_setup = Network_Setup(data_folder)
+        self.logger = Logger_Setup.setup_logger('NetworkAnalysis')
 
-if __name__ == "__main__":
-  data_folder = 'data'
-  network_analysis = NetworkAnalysis(data_folder)
-  network_analysis.analyze_network()
+    def analyze_network(self):
+        self.network_setup.setup_network()
+        self._run_pf()
+        self._run_opf()
+
+    def _run_pf(self):
+        self.logger.info("Running Power Flow analysis...")
+        self.network_setup.network.pf()
+        self.logger.info("Power Flow analysis completed successfully!")
+
+    def _run_opf(self):
+        self.logger.info("Running Optimal Power Flow analysis...")
+        self.network_setup.network.optimize()
+        self.logger.info("Optimal Power Flow analysis completed successfully!")
+
+    def get_results(self):
+        return self.network_setup.network.buses_t.p_set
+
+    def save_results(self, output_file):
+        results = self.get_results()
+        results.to_csv(output_file)
+        self.logger.info(f"Results saved to {output_file}")
+
+    def main(data_folder, output_file):
+        network_analysis = Network_Analysis(data_folder)
+        network_analysis.analyze_network()
+        network_analysis.save_results(output_file)
+
+if __name__ == '__main__':
+    data_folder = 'data'
+    output_file = 'results.csv'
+    Network_Analysis.main(data_folder, output_file)
