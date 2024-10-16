@@ -1,148 +1,212 @@
 import pypsa
 import pandas as pd
-import os
+from data_loader import DataLoader
+from logger_setup import LoggerSetup
 
 class Network_Setup:
-  """
-  NetworkSetup class for setting up and managing a PyPSA network.
-  Attributes:
-    data_folder (str): Path to the folder containing network data files.
-    network (pypsa.Network): Instance of the PyPSA Network.
-  """
-  def __init__(self, data_folder):
-    self.data_folder = data_folder
-    self.network = pypsa.Network()
+    """
+    NetworkSetup class for setting up and managing a PyPSA network.
+    Attributes:
+        data_folder (str): Path to the folder containing network data files.
+        network (pypsa.Network): Instance of the PyPSA Network.
+    """
+    def __init__(self, data_folder):
+        self.data_folder = data_folder
+        self.network = pypsa.Network()
+        self.network.set_snapshots(pd.date_range("2021-01-01", periods=24, freq="h"))
+        self.data_loader = DataLoader(data_folder)
+        self.logger = LoggerSetup.setup_logger('NetworkSetup')
 
-  def setup_network(self):
-    self._add_buses()
-    self._add_generators()
-    self._add_storage_units()
-    self._add_loads()
-    self._add_lines()
-    print("Network was setup successfully!\n")
+    def setup_network(self):
+        self._add_buses()
+        self._add_generators()
+        self._add_storage_units()
+        self._add_lines()
+        self._add_transformers()
+        self._add_links()
+        self._add_loads()
+        self.logger.info("Network was setup successfully!")
 
-  def _add_buses(self):
-    buses_file = os.path.join(self.data_folder, 'buses.csv')
-    buses = pd.read_csv(buses_file)
-    for _, row in buses.iterrows():
-      self.network.add("Bus", row['name'],
-      v_nom=row['v_nom'],
-      x=row['x'],
-      y=row['y'],
-      carrier=row['carrier']
-      )
-    print("\nBuses added successfully!\n")
+    def _add_component(self, component_type, data_file, **kwargs):
+        data = self.data_loader.read_csv(data_file)
+        if not data.empty:
+            for _, row in data.iterrows():
+                self.network.add(component_type, row['name'], **{key: row.get(key, kwargs[key]) for key in kwargs})
+            self.logger.info(f"{component_type} added successfully!")
+        else:
+            self.logger.warning(f"No {component_type} were added to the network.")
 
-  def _add_generators(self):
-    generators_file = os.path.join(self.data_folder, 'generators.csv')
-    generators = pd.read_csv(generators_file)
-    for _, row in generators.iterrows():
-      self.network.add("Generator", row['name'],
-      bus=row['bus'],
-      p_nom=row['p_nom'],
-      efficiency=row['efficiency'],
-      capital_cost=row['capital_cost'],
-      marginal_cost=row['op_cost']
-      )
-    print("Generators added successfully!\n")
+    def _add_buses(self):
+        self._add_component("Bus", 'buses.csv',
+            v_nom=0.0,
+            x=0.0,
+            y=0.0,
+            carrier='',
+            v_mag_pu_set=None,
+            v_mag_pu_min=None,
+            v_mag_pu_max=None,
+            control=None,
+            v_target=None,
+            marginal_cost=0.0,
+            zone='',
+            type='',
+            max_shunt_capacitor=0.0,
+            min_shunt_capacitor=0.0,
+            reactive_power_setpoint=0.0,
+            load_profile=''
+        )
 
-  def _add_storage_units(self):
-    storage_units_file = os.path.join(self.data_folder, 'storage_units.csv')
-    storage_units = pd.read_csv(storage_units_file)
-    for _, row in storage_units.iterrows():
-      self.network.add("StorageUnit", row['name'],
-      bus=row['bus'],
-      p_nom=row['p_nom'],
-      capital_cost=row['capital_cost'],
-      state_of_charge_initial=row['state_of_charge_initial'],
-      efficiency_store=row['efficiency_store'],
-      efficiency_dispatch=row['efficiency_dispatch']
-      )
-    print("Storage units added successfully!\n")
+    def _add_generators(self):
+        self._add_component("Generator", 'generators.csv',
+            bus='',
+            control='',
+            p_nom=0.0,
+            efficiency=0.0,
+            capital_cost=0.0,
+            marginal_cost=0.0,
+            p_max_pu=0.0,
+            p_min_pu=0.0
+        )
 
-  def _add_loads(self):
-    loads_file = os.path.join(self.data_folder, 'loads.csv')
-    loads = pd.read_csv(loads_file)
-    for _, load in loads.iterrows():
-      self.network.add("Load", load['name'],
-      bus=load['bus'],
-      carrier=load['carrier'],
-      p_set=load['p_set'],
-      q_set=load['q_set']
-      )
-    print("Loads added successfully!\n")
+    def _add_storage_units(self):
+        self._add_component("StorageUnit", 'storage_units.csv',
+            bus='',
+            p_nom=0.0,
+            capital_cost=0.0,
+            state_of_charge_initial=0.0,
+            efficiency_store=0.0,
+            efficiency_dispatch=0.0,
+            max_hours=0.0,
+            marginal_cost=0.0,
+            p_min_pu=0.0,
+            p_max_pu=0.0,
+            cyclic_state_of_charge=False,
+            state_of_charge_min=0.0,
+            state_of_charge_max=0.0
+        )
 
-  def _add_lines(self):
-    lines_file = os.path.join(self.data_folder, 'lines.csv')
-    lines = pd.read_csv(lines_file)
-    for _, line in lines.iterrows():
-      self.network.add("Line", line['name'],
-      bus0=line['bus0'],
-      bus1=line['bus1'],
-      x=line['x'],
-      r=line['r'],
-      capital_cost=line['capital_cost'],
-      length=line['length']
-      )
-    print("Lines added successfully!\n")
+    def _add_lines(self):
+        self._add_component("Line", 'lines.csv',
+            bus0='',
+            bus1='',
+            length=0.0,
+            r_per_length=0.0,
+            x_per_length=0.0,
+            c_per_length=0.0,
+            s_nom=0.0,
+            type='',
+            capital_cost=0.0
+        )
 
-  def get_network(self):
-    if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
-      print("Warning: The network is empty.\n")
-    return self.network
+    def _add_transformers(self):
+        self._add_component("Transformer", 'transformers.csv',
+            bus0='',
+            bus1='',
+            s_nom=0.0,
+            x=0.0,
+            r=0.0,
+            tap_position=0,
+            tap_min=0,
+            tap_max=0,
+            tap_step=0.0,
+            efficiency=0.0,
+            capital_cost=0.0
+        )
 
-  def get_generators(self):
-    if self.network.generators.empty:
-      print("Warning: The generators DataFrame is empty.\n")
-    return self.network.generators
+    def _add_links(self):
+        self._add_component("Link", 'links.csv',
+            bus0='',
+            bus1='',
+            p_nom=0.0,
+            efficiency=0.0,
+            capital_cost=0.0,
+            transformer_type='',
+            min_pu=0.0,
+            max_pu=0.0,
+            reactive_power_capacity=0.0,
+            r=0.0,
+            x=0.0,
+            startup_cost=0.0,
+            shutdown_cost=0.0,
+            ramp_up=0.0,
+            ramp_down=0.0,
+            maintenance_cost=0.0,
+            control_type=''
+        )
 
-  def get_loads(self):
-    if self.network.loads.empty:
-      print("Warning: The loads DataFrame is empty.\n")
-    return self.network.loads
+    def _add_loads(self):
+        loads = self.data_loader.read_csv('loads.csv')
+        if loads.empty:
+            self.logger.warning("No loads were added to the network.")
+            return
+        for _, load in loads.iterrows():
+            self.network.add("Load", load['name'],
+            bus=load.get('bus', ''),
+            p_set=pd.Series([float(x) for x in load.get('p_set', '').split(',')], index=self.network.snapshots),
+            q_set=pd.Series([float(x) for x in load.get('q_set', '').split(',')], index=self.network.snapshots),
+            p_min=load.get('p_min', 0.0),
+            p_max=load.get('p_max', 0.0),
+            scaling_factor=load.get('scaling_factor', 1.0),
+            status=load.get('status', True),
+            control_type=load.get('control_type', ''),
+            response_time=load.get('response_time', 0.0),
+            priority=load.get('priority', 0)
+            )
+        self.logger.info("Loads added successfully!")
 
-  def get_lines(self):
-    if self.network.lines.empty:
-      print("Warning: The lines DataFrame is empty.\n")
-    return self.network.lines
+    def get_network(self):
+        if self.network.buses.empty and self.network.generators.empty and self.network.storage_units.empty and self.network.loads.empty and self.network.lines.empty:
+            self.logger.warning("The network is empty.")
+        return self.network
 
-  def get_buses(self):
-    if self.network.buses.empty:
-      print("Warning: The buses DataFrame is empty.\n")
-    return self.network.buses
+    def get_generators(self):
+        if self.network.generators.empty:
+            self.logger.warning("The generators DataFrame is empty.")
+        return self.network.generators
 
-  def get_time_series(self):
-    if self.network.loads_t.p_set.empty:
-      print("Warning: The time series DataFrame is empty.\n")
-    return self.network.loads_t.p_set
+    def get_loads(self):
+        if self.network.loads.empty:
+            self.logger.warning("The loads DataFrame is empty.")
+        return self.network.loads
 
-  def get_time_series_for_bus(self, bus_name):
-    if bus_name not in self.network.loads_t.p_set.columns:
-      print(f"Warning: No time series data for bus '{bus_name}'.\n")
-    return self.network.loads_t.p_set[bus_name]
+    def get_lines(self):
+        if self.network.lines.empty:
+            self.logger.warning("The lines DataFrame is empty.")
+        return self.network.lines
 
-  def get_time_series_for_generator(self, generator_name):
-    if generator_name not in self.network.generators_t.p.columns:
-      print(f"Warning: No time series data for generator '{generator_name}'.\n")
-    return self.network.generators_t.p[generator_name]
+    def get_buses(self):
+        if self.network.buses.empty:
+            self.logger.warning("The buses DataFrame is empty.")
+        return self.network.buses
 
-  def get_time_series_for_line(self, line_name):
-    if line_name not in self.network.lines_t.p0.columns:
-      print(f"Warning: No time series data for line '{line_name}'.\n")
-    return self.network.lines_t.p0[line_name]
+    def get_storage_units(self):
+        if self.network.storage_units.empty:
+            self.logger.warning("The storage units DataFrame is empty.")
+        return self.network.storage_units
 
-  def get_time_series_for_load(self, load_name):
-    if load_name not in self.network.loads_t.p.columns:
-      print(f"Warning: No time series data for load '{load_name}'.\n")
-    return self.network.loads_t.p[load_name]
+    def get_transformers(self):
+        if self.network.transformers.empty:
+            self.logger.warning("The transformers DataFrame is empty.")
+        return self.network.transformers
+
+    def get_links(self):
+        if self.network.links.empty:
+            self.logger.warning("The links DataFrame is empty.")
+        return self.network.links
+
+def main():
+    data_folder = 'data'
+    network_setup = Network_Setup(data_folder)
+    network_setup.setup_network()
+    network = network_setup.get_network()
+    logger = LoggerSetup.setup_logger('Main')
+    logger.info(network.buses)
+    logger.info(network.generators)
+    logger.info(network.storage_units)
+    logger.info(network.loads)
+    logger.info(network.lines)
+    logger.info(network.transformers)
+    logger.info(network.links)
 
 if __name__ == "__main__":
-  data_folder = 'data'
-  network_setup = Network_Setup(data_folder)
-  network_setup.setup_network()
-  network = network_setup.get_network()
-  print(network.buses, "\n")
-  print(network.generators, "\n")
-  print(network.storage_units, "\n")
-  print(network.loads, "\n")
-  print(network.lines, "\n")
+    main()

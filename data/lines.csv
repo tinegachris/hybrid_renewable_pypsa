@@ -1,4 +1,5 @@
-name,bus0,bus1,x,r,capital_cost,length
-line1,bus1,bus2,0.1,0.1,100,10
-line2,bus2,bus3,0.2,0.2,200,20
-line3,bus3,bus1,0.3,0.3,300,30
+name,bus0,bus1,length,r_per_length,x_per_length,c_per_length,s_nom,type,capital_cost,description
+Line_Hydro_to_Site,Hydro_AC_11kV,AC_415,5.0,0.15,0.4,0.02,1500,MV_line,1200,"5 km medium voltage line from hydropower bus to AC 415 bus."
+Line_Grid_to_Site,Grid_AC_33kV,AC_415,1.0,0.05,0.2,0.01,4000,HV_line,1000,"High voltage line connecting the grid bus to the AC 415 bus."
+Line_Battery_to_Site,BAT_AC_800,AC_415,2.0,0.02,0.1,0.005,2000,MV_line,500,"2 km medium voltage line connecting battery inverter bus to AC 415 bus."
+Line_Solar_to_Site,PV_DC_1000,AC_415,1.5,0.03,0.15,0.008,3000,MV_line,600,"1.5 km medium voltage line connecting solar PV bus to AC 415 bus."

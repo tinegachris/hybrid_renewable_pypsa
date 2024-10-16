@@ -1,4 +1,9 @@
-name,v_nom,x,y,carrier,v_mag_pu_set,v_mag_pu_min,v_mag_pu_max,control
-bus1,110,10,20,AC,1.0,0.0,inf,Slack
-bus2,220,30,40,AC,1.0,0.0,inf,PQ
-bus3,110,50,60,AC,1.0,0.0,inf,PQ
+name,v_nom,x,y,carrier,v_mag_pu_set,v_mag_pu_min,v_mag_pu_max,control,v_target,marginal_cost,zone,type,max_shunt_capacitor,min_shunt_capacitor,reactive_power_setpoint,load_profile,description
+AC_415,415,0.0,0.0,AC,1.0,0.95,1.05,PQ,1.02,0,A,load,200,-200,0,load_ac.csv,Main load and generation bus
+BAT_DC_1500,1500,0.0,-6.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,storage,0,0,0,storage_dc.csv,Battery storage bus
+Hydro_AC_11kV,11000,6.0,0.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0,hydro_profile.csv,Hydro power generation bus
+Hydro_AC_415,415,6.0,-3.0,AC,1.0,0.95,1.05,PV,1.0,0.005,A,generator,100,-100,0,hydro_profile.csv,Hydro power generation bus
+Grid_AC_33kV,33000,-10.0,0.0,AC,1.0,0.95,1.05,Slack,1.0,0.01,B,grid,0,0,0,grid_profile.csv,Connection to national grid
+PV_DC_1000,1000,-5.0,-5.0,DC,1.0,0.95,1.05,PQ,1.0,0,A,generator,0,0,0,pv_profile.csv,Solar PV DC connection bus
+BAT_AC_800,800,0.0,-3.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,converter,100,-100,0,ac_800_profile.csv,Battery inverter AC output bus
+Load_AC_Bus,415,0.0,3.0,AC,1.0,0.95,1.05,PQ,1.0,0,A,load,0,0,0,load_ac.csv,Load bus connected to the AC 415 bus
