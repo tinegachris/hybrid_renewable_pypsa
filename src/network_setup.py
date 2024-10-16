@@ -47,14 +47,13 @@ class Network_Setup:
             x=0.0,
             y=0.0,
             carrier='',
-            v_mag_pu_set=None,
-            v_mag_pu_min=None,
-            v_mag_pu_max=None,
-            control=None,
-            v_target=None,
+            v_mag_pu_set=0.0,
+            v_mag_pu_min=0.0,
+            v_mag_pu_max=0.0,
+            control='',
+            v_target=0.0,
             marginal_cost=0.0,
             zone='',
-            type='',
             max_shunt_capacitor=0.0,
             min_shunt_capacitor=0.0,
             reactive_power_setpoint=0.0
@@ -67,24 +66,25 @@ class Network_Setup:
             p_nom=0.0,
             efficiency=0.0,
             capital_cost=0.0,
-            marginal_cost=0.0,
+            op_cost=0.0,
             p_max_pu=0.0,
-            p_min_pu=0.0
+            p_min_pu=0.0,
+            marginal_cost=0.0
         )
 
     def _add_storage_units(self):
         self._add_component("StorageUnit", 'storage_units.csv',
             bus='',
             p_nom=0.0,
-            capital_cost=0.0,
-            state_of_charge_initial=0.0,
+            max_hours=0.0,
             efficiency_store=0.0,
             efficiency_dispatch=0.0,
-            max_hours=0.0,
+            capital_cost=0.0,
             marginal_cost=0.0,
             p_min_pu=0.0,
             p_max_pu=0.0,
             cyclic_state_of_charge=False,
+            state_of_charge_initial=0.0,
             state_of_charge_min=0.0,
             state_of_charge_max=0.0
         )
@@ -101,8 +101,8 @@ class Network_Setup:
                     x_per_length=row.get('x_per_length', 0.0),
                     c_per_length=row.get('c_per_length', 0.0),
                     s_nom=row.get('s_nom', 0.0),
-                    x=row['x_per_length']*row['length'],
-                    r=row['r_per_length']*row['length'],
+                    r=row['r_per_length'] * row['length'],
+                    x=row['x_per_length'] * row['length'],
                     capital_cost=row.get('capital_cost', 0.0),
                     carrier=row.get('carrier', '')
                 )
@@ -144,7 +144,8 @@ class Network_Setup:
             ramp_down=0.0,
             maintenance_cost=0.0,
             status=True,
-            control_type=''
+            control_type='',
+            carrier=''
         )
 
     def _add_loads(self):
@@ -161,7 +162,7 @@ class Network_Setup:
             p_max=load.get('p_max', 0.0),
             scaling_factor=load.get('scaling_factor', 1.0),
             status=load.get('active', True),
-            carrier=load.get('carrier', ''),
+            carrier=load.get('carrier', '')
             )
         self.logger.info("Loads added successfully!\n")
 
