@@ -32,6 +32,19 @@ class Network_Setup:
         self._add_links()
         logger.info("Network was setup successfully!")
 
+    def _read_csv(self, file_name):
+        file_path = os.path.join(self.data_folder, file_name)
+        try:
+            return pd.read_csv(file_path)
+        except FileNotFoundError:
+            logger.error(f"File {file_name} not found in the data folder.")
+        except pd.errors.EmptyDataError:
+            logger.error(f"File {file_name} is empty.")
+        except Exception as e:
+            logger.error(f"An error occurred while reading file {file_name}.")
+            logger.error(e)
+        return pd.DataFrame() # Return an empty DataFrame if an error occurs
+
     def _add_buses(self):
         buses_file = os.path.join(self.data_folder, 'buses.csv')
         buses = pd.read_csv(buses_file)
