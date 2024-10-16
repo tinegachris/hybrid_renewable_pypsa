@@ -159,41 +159,6 @@ class Network_Setup:
             self.logger.warning("The network is empty.")
         return self.network
 
-    def get_generators(self):
-        if self.network.generators.empty:
-            self.logger.warning("The generators DataFrame is empty.")
-        return self.network.generators
-
-    def get_loads(self):
-        if self.network.loads.empty:
-            self.logger.warning("The loads DataFrame is empty.")
-        return self.network.loads
-
-    def get_lines(self):
-        if self.network.lines.empty:
-            self.logger.warning("The lines DataFrame is empty.")
-        return self.network.lines
-
-    def get_buses(self):
-        if self.network.buses.empty:
-            self.logger.warning("The buses DataFrame is empty.")
-        return self.network.buses
-
-    def get_storage_units(self):
-        if self.network.storage_units.empty:
-            self.logger.warning("The storage units DataFrame is empty.")
-        return self.network.storage_units
-
-    def get_transformers(self):
-        if self.network.transformers.empty:
-            self.logger.warning("The transformers DataFrame is empty.")
-        return self.network.transformers
-
-    def get_links(self):
-        if self.network.links.empty:
-            self.logger.warning("The links DataFrame is empty.")
-        return self.network.links
-
 def main():
     data_folder = 'data'
     network_setup = Network_Setup(data_folder)
