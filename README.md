@@ -1,6 +1,6 @@
 # Hybrid Renewable PyPSA Network Analysis
 
-[![GitHub license](https://img.shields.io/github/license/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/blob/main/LICENSE)
+[![Github license](https://img.shields.io/github/license/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/blob/main/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/graphs/contributors)
 [![GitHub issues](https://img.shields.io/github/issues/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/issues)
 [![GitHub pull-requests](https://img.shields.io/github/issues-pr/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/pulls)
