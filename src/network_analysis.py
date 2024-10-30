@@ -18,13 +18,30 @@ class Network_Analysis:
   def analyze_network(self):
     self.logger.info("Analyzing network...\n")
     self._run_consistency_check()
-    self._run_pf()
-    self._run_opf()
-    self._run_storage_analysis()
-    self._run_reliability_analysis()
-    self._run_load_shift_analysis()
-    self._run_losses_analysis()
+    self._run_optimization()
+    
+    
+    
+    
+    
+    
+    # self._run_pf()
+    # self._run_opf()
+    # self._run_storage_analysis()
+    # self._run_reliability_analysis()
+    # self._run_load_shift_analysis()
+    # self._run_losses_analysis()
     self.logger.info("Network analysis completed successfully!\n")
+
+
+  # Optimization
+  def _run_optimization(self):
+    """
+    Run optimization to determine the optimal generation dispatch while minimizing cost, maximizing efficiency, or reducing emissions.
+    """
+    self.logger.info("Running optimization...\n")
+    self.network_setup.network.optimize(solver_name="highs")
+    self.logger.info("Optimization completed successfully!\n")
 
   def _run_consistency_check(self):
     """
@@ -40,8 +57,11 @@ class Network_Analysis:
     Determine voltage, current, and power flows in each line, and voltages at each bus under steady-state conditions.
     """
     self.logger.info("Running Power Flow analysis...\n")
-    self.network_setup.network.pf()
-    self.logger.info("Power Flow analysis completed successfully!\n")
+    pf_result = self.network_setup.network.pf()
+    if pf_result:
+        self.logger.info("Power Flow analysis completed successfully!\n")
+    else:
+        self.logger.warning("Power Flow analysis did not converge.\n")
 
   def _run_opf(self):
     """
