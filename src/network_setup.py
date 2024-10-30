@@ -13,7 +13,7 @@ class Network_Setup:
     def __init__(self, data_folder):
         self.data_folder = data_folder
         self.network = pypsa.Network()
-        self.network.set_snapshots(pd.date_range("2024-10-01", periods=24, freq="h"))
+        # self.network.set_snapshots(pd.date_range("2024-10-01", periods=24, freq="h"))
         self.data_loader = Data_Loader(data_folder)
         self.logger = Logger_Setup.setup_logger('NetworkSetup')
 
@@ -134,28 +134,28 @@ class Network_Setup:
     #         capital_cost=0.0
     #     )
 
-    def _add_links(self):
-        self._add_component("Link", 'links.csv',
-            bus0='',
-            bus1='',
-            p_nom=0.0,
-            efficiency=0.0,
-            capital_cost=0.0,
-            transformer_type='',
-            p_min_pu=0.0,
-            p_max_pu=0.0,
-            reactive_power_capacity=0.0,
-            r=0.0,
-            x=0.0,
-            startup_cost=0.0,
-            shutdown_cost=0.0,
-            ramp_up=0.0,
-            ramp_down=0.0,
-            maintenance_cost=0.0,
-            status=True,
-            control_type='',
-            carrier=''
-        )
+    # def _add_links(self):
+    #     self._add_component("Link", 'links.csv',
+    #         bus0='',
+    #         bus1='',
+    #         p_nom=0.0,
+    #         efficiency=0.0,
+    #         capital_cost=0.0,
+    #         transformer_type='',
+    #         p_min_pu=0.0,
+    #         p_max_pu=0.0,
+    #         reactive_power_capacity=0.0,
+    #         r=0.0,
+    #         x=0.0,
+    #         startup_cost=0.0,
+    #         shutdown_cost=0.0,
+    #         ramp_up=0.0,
+    #         ramp_down=0.0,
+    #         maintenance_cost=0.0,
+    #         status=True,
+    #         control_type='',
+    #         carrier=''
+    #     )
 
     def _add_loads(self):
         loads = self.data_loader.read_csv('loads.csv')
@@ -187,14 +187,15 @@ def main():
     network_setup = Network_Setup(data_folder)
     network_setup.setup_network()
     network = network_setup.get_network()
-    logger = Logger_Setup.setup_logger('Main')
+    network.pf() # Run power flow analysis
+    logger = Logger_Setup.setup_logger('NetworkSetup_Main')
     logger.info(network.buses)
     logger.info(network.generators)
-    logger.info(network.storage_units)
+    # logger.info(network.storage_units)
     logger.info(network.loads)
     logger.info(network.lines)
-    logger.info(network.transformers)
-    logger.info(network.links)
+    # logger.info(network.transformers)
+    # logger.info(network.links)
 
 if __name__ == "__main__":
     main()
