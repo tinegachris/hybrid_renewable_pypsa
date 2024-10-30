@@ -18,9 +18,18 @@ class Network_Setup:
         self.logger = Logger_Setup.setup_logger('NetworkSetup')
 
         # Define necessary carriers for buses, lines, and links
-        self.network.add("Carrier", "AC")
-        self.network.add("Carrier", "DC")
-        self.network.add("Carrier", "electricity")
+        carriers = [
+            {"name": "coal", "co2_emissions": 1, "nice_name": "Coal", "color": "grey"},
+            {"name": "gas", "co2_emissions": 2, "nice_name": "Gas", "color": "indianred"},
+            {"name": "oil", "co2_emissions": 3, "nice_name": "Oil", "color": "black"},
+            {"name": "hydro", "co2_emissions": 4, "nice_name": "Hydro", "color": "aquamarine"},
+            {"name": "wind", "co2_emissions": 5, "nice_name": "Onshore Wind", "color": "dodgerblue"},
+            {"name": "electricity", "co2_emissions": 6, "nice_name": "Electricity", "color": "yellow"},
+            {"name": "AC", "co2_emissions": 7, "nice_name": "AC"},
+            {"name": "DC", "co2_emissions": 8, "nice_name": "DC"},
+        ]
+        for carrier in carriers:
+            self.network.add("Carrier", carrier["name"], **{k: v for k, v in carrier.items() if k != "name"})
 
     def setup_network(self):
         self._add_buses()
