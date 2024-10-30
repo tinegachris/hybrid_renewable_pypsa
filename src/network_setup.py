@@ -34,10 +34,10 @@ class Network_Setup:
     def setup_network(self):
         self._add_buses()
         self._add_generators()
-        self._add_storage_units()
+        # self._add_storage_units()
         self._add_lines()
-        self._add_transformers()
-        self._add_links()
+        # self._add_transformers()
+        # self._add_links()
         self._add_loads()
         self.logger.info("Network was setup successfully!\n")
 
@@ -81,22 +81,22 @@ class Network_Setup:
             marginal_cost=0.0
         )
 
-    def _add_storage_units(self):
-        self._add_component("StorageUnit", 'storage_units.csv',
-            bus='',
-            p_nom=0.0,
-            max_hours=0.0,
-            efficiency_store=0.0,
-            efficiency_dispatch=0.0,
-            capital_cost=0.0,
-            marginal_cost=0.0,
-            p_min_pu=0.0,
-            p_max_pu=0.0,
-            cyclic_state_of_charge=False,
-            state_of_charge_initial=0.0,
-            state_of_charge_min=0.0,
-            state_of_charge_max=0.0
-        )
+    # def _add_storage_units(self):
+    #     self._add_component("StorageUnit", 'storage_units.csv',
+    #         bus='',
+    #         p_nom=0.0,
+    #         max_hours=0.0,
+    #         efficiency_store=0.0,
+    #         efficiency_dispatch=0.0,
+    #         capital_cost=0.0,
+    #         marginal_cost=0.0,
+    #         p_min_pu=0.0,
+    #         p_max_pu=0.0,
+    #         cyclic_state_of_charge=False,
+    #         state_of_charge_initial=0.0,
+    #         state_of_charge_min=0.0,
+    #         state_of_charge_max=0.0
+    #     )
 
     def _add_lines(self):
         data = self.data_loader.read_csv('lines.csv')
@@ -106,12 +106,12 @@ class Network_Setup:
                     bus0=row.get('bus0', ''),
                     bus1=row.get('bus1', ''),
                     length=row.get('length', 0.0),
-                    r_per_length=row.get('r_per_length', 0.0),
-                    x_per_length=row.get('x_per_length', 0.0),
-                    c_per_length=row.get('c_per_length', 0.0),
+                    # r_per_length=row.get('r_per_length', 0.0),
+                    # x_per_length=row.get('x_per_length', 0.0),
+                    # c_per_length=row.get('c_per_length', 0.0),
                     s_nom=row.get('s_nom', 0.0),
-                    r=row['r_per_length'] * row['length'],
-                    x=row['x_per_length'] * row['length'],
+                    r=row.get('r', 0.0),
+                    x=row.get('x', 0.0),
                     capital_cost=row.get('capital_cost', 0.0),
                     carrier=row.get('carrier', '')
                 )
@@ -119,20 +119,20 @@ class Network_Setup:
         else:
             self.logger.warning("No lines were added to the network.")
 
-    def _add_transformers(self):
-        self._add_component("Transformer", 'transformers.csv',
-            bus0='',
-            bus1='',
-            s_nom=0.0,
-            x=0.0,
-            r=0.0,
-            tap_position=0,
-            tap_min=0,
-            tap_max=0,
-            tap_step=0.0,
-            efficiency=0.0,
-            capital_cost=0.0
-        )
+    # def _add_transformers(self):
+    #     self._add_component("Transformer", 'transformers.csv',
+    #         bus0='',
+    #         bus1='',
+    #         s_nom=0.0,
+    #         x=0.0,
+    #         r=0.0,
+    #         tap_position=0,
+    #         tap_min=0,
+    #         tap_max=0,
+    #         tap_step=0.0,
+    #         efficiency=0.0,
+    #         capital_cost=0.0
+    #     )
 
     def _add_links(self):
         self._add_component("Link", 'links.csv',
@@ -165,8 +165,10 @@ class Network_Setup:
         for _, load in loads.iterrows():
             self.network.add("Load", load['name'],
             bus=load.get('bus', ''),
-            p_set=pd.Series([float(x) for x in load.get('p_set', '').split(',')], index=self.network.snapshots),
-            q_set=pd.Series([float(x) for x in load.get('q_set', '').split(',')], index=self.network.snapshots),
+            p_set=load.get('p_set', 0.0),
+            q_set=load.get('q_set', 0.0),
+            # p_set=pd.Series([float(x) for x in load.get('p_set', '').split(',')], index=self.network.snapshots),
+            # q_set=pd.Series([float(x) for x in load.get('q_set', '').split(',')], index=self.network.snapshots),
             p_min=load.get('p_min', 0.0),
             p_max=load.get('p_max', 0.0),
             scaling_factor=load.get('scaling_factor', 1.0),
