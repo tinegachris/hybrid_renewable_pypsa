@@ -1,0 +1,6 @@
+name,bus,carrier,efficiency,p_nom,maginal_cost
+hydro,station1,hydro,0.2,1200,0.1
+coal,station2,hydro,0.8,1000,0.2
+wind,station2,wind,0.9,800,0.05
+gas,station2,gas,0.4,600,0.3
+solar,station2,solar,0.7,400,0.1

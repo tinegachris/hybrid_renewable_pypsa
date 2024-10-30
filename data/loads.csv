@@ -1,0 +1,3 @@
+name,bus,p_set,carrier
+load1,station1,650,electricity
+load2,station2,42000,electricity
