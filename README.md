@@ -9,7 +9,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Fork)](https://github.com/tinegachris/hybrid_renewable_pypsa/network/members)
 [![GitHub stars](https://img.shields.io/github/stars/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Sta)](https://github.com/tinegachris/hybrid_renewable_pypsa/stargazers)
 
-![image](https://github.com/user-attachments/assets/29608f2e-b8e6-4f5e-956a-45220517be5a)
+![pypsa_cover](https://github.com/user-attachments/assets/931c8053-ea86-47ee-acb4-826bf21262ae)
 
 This project involves the analysis of a hybrid renewable energy network using PyPSA (Python for Power System Analysis).
 
