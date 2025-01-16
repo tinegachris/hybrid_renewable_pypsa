@@ -7,7 +7,7 @@ packages = [
     { include = "hybrid_renewable_pypsa" }
 ]
 name = "Hybrid Renewable PyPSA Network Analysis"
-version = "0.1.0"
+version = "0.2.0"
 description = "Analysis of a hybrid renewable energy network using PyPSA (Python for Power System Analysis)"
 authors = ["Chrispine Tinega <hello@chrispinetinega.com>"]
 
@@ -22,3 +22,6 @@ numpy = "<2.0.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 sphinx = "^8.1.3"
+ruff = "^0.9.1"
+black = "^24.10.0"
+pre-commit = "^4.0.1"
