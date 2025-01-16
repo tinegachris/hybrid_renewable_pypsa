@@ -160,7 +160,7 @@ class Network_Setup:
         return self.network
 
 def main():
-    data_folder = 'data'
+    data_folder = 'hybrid_renewable_pypsa/data'
     network_setup = Network_Setup(data_folder)
     network_setup.setup_network()
     network = network_setup.get_network()
