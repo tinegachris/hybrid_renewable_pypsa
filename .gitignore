@@ -30,6 +30,11 @@ env/
 venv/
 env/
 
+VS Code
+.vscode/
+.vscode-test/
+.vs
+
 # Package files
 *.egg-info/
 .eggs/

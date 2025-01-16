@@ -1,6 +1,6 @@
 import logging
 
-class LoggerSetup:
+class Logger_Setup:
     @staticmethod
     def setup_logger(name):
         logger = logging.getLogger(name)

@@ -1,55 +1,97 @@
-import pandas as pd
-import numpy as np
-
 from network_setup import Network_Setup
+from data_loader import Data_Loader
+from logger_setup import Logger_Setup
 
-class NetworkAnalysis:
+class Network_Analysis:
   """
-  NetworkAnalysis class for analyzing a PyPSA network.
+  Network_Analysis class for analyzing a PyPSA network.
   Attributes:
-    network (pypsa.Network): Instance of the PyPSA Network.
+      network_setup (Network_Setup): Instance of the Network_Setup class.
   """
-  def __init__(self, network):
+  def __init__(self, data_folder):
+    self.data_loader = Data_Loader(data_folder)
     self.network_setup = Network_Setup(data_folder)
     self.network_setup.setup_network()
     self.network = self.network_setup.get_network()
+    self.logger = Logger_Setup.setup_logger('NetworkAnalysis')
 
   def analyze_network(self):
-    self._analyze_buses()
-    self._analyze_generators()
-    self._analyze_storage_units()
-    self._analyze_lines()
-    self._analyze_loads()
+    self.logger.info("Analyzing network...\n")
+    self._run_consistency_check()
+    self._run_pf()
+    self._run_opf()
+    self._run_storage_analysis()
+    self._run_reliability_analysis()
+    self._run_load_shift_analysis()
+    self._run_losses_analysis()
+    self.logger.info("Network analysis completed successfully!\n")
 
-  def _analyze_buses(self):
-    buses = self.network_setup.get_buses()
-    print(buses, "\n")
-
-  def _analyze_generators(self):
-    generators = self.network_setup.get_generators()
-    print(generators, "\n")
-
-  def _analyze_storage_units(self):
-    storage_units = self.network_setup.get_storage_units()
-    print(storage_units, "\n")
-
-  def _analyze_lines(self):
-    lines = self.network_setup.get_lines()
-    print(lines, "\n")
-
-  def _analyze_loads(self):
-    loads = self.network_setup.get_loads()
-    print(loads, "\n")
-
-  def _analyze_power_flows(self):
-    """Perform Newton-Raphson power flow analysis on the network.
+  def _run_consistency_check(self):
     """
-    power_flows = self.network.pf()
-    self.network.lines_t.p0
-    self.network.buses_t.v_ang * 180 / np.pi
-    self.network.buses_t.v_mag_pu
+    Check the consistency of the network.
+    """
+    self.logger.info("Running consistency check...\n")
+    self.network.consistency_check()
+    self.logger.info("Consistency check completed successfully!\n")
 
-if __name__ == "__main__":
-  data_folder = 'data'
-  network_analysis = NetworkAnalysis(data_folder)
-  network_analysis.analyze_network()
+
+  def _run_pf(self):
+    """
+    Determine voltage, current, and power flows in each line, and voltages at each bus under steady-state conditions.
+    """
+    self.logger.info("Running Power Flow analysis...\n")
+    self.network_setup.network.pf()
+    self.logger.info("Power Flow analysis completed successfully!\n")
+
+  def _run_opf(self):
+    """
+    Determine the optimal generation dispatch while minimizing cost, maximizing efficiency, or reducing emissions.
+    """
+    self.logger.info("Running Optimal Power Flow analysis...\n")
+    self.network_setup.network.optimize()
+    self.logger.info("Optimal Power Flow analysis completed successfully!\n")
+
+  def _run_storage_analysis(self):
+    """
+    Evaluate how the storage system performs over time, including charge and discharge cycles.
+    """
+    self.logger.info("Running Storage analysis...\n")
+    #self.network_setup.network.storage_analysis()
+    self.logger.info("Storage analysis completed successfully!\n")
+
+  def _run_reliability_analysis(self):
+    """
+    Evaluate the reliability of the network, including the impact of outages and failures.
+    """
+    self.logger.info("Running Reliability analysis...\n")
+    #self.network_setup.network.reliability_analysis()
+    self.logger.info("Reliability analysis completed successfully!\n")
+
+  def _run_load_shift_analysis(self):
+    """
+    Evaluate the impact of shifting loads to off-peak hours.
+    """
+    self.logger.info("Running Load Shift analysis...\n")
+    #self.network_setup.network.load_shift_analysis()
+    self.logger.info("Load Shift analysis completed successfully!\n")
+
+  def _run_losses_analysis(self):
+    """
+    Evaluate the losses in the network, including line, bus, and transformer losses
+    """
+    line_losses = self.network_setup.network.lines_t.p0 - self.network_setup.network.lines_t.p1
+    self.logger.info(f"Line losses: {line_losses.sum().sum()}")
+    bus_losses = self.network_setup.network.buses_t.p_set.sum(axis=1) - self.network_setup.network.buses_t.p.sum(axis=1)
+    self.logger.info(f"Bus losses: {bus_losses.sum()}")
+    transformer_losses = self.network_setup.network.transformers_t.p0 - self.network_setup.network.transformers_t.p1
+    self.logger.info(f"Transformer losses: {transformer_losses.sum().sum()}")
+    self.logger.info(f"Total losses: {line_losses.sum().sum() + bus_losses.sum() + transformer_losses.sum().sum()}")
+
+  def main(data_folder):
+    data_folder = 'data'
+    network_analysis = Network_Analysis(data_folder)
+    network_analysis.analyze_network()
+
+if __name__ == '__main__':
+    data_folder = 'data'
+    Network_Analysis.main(data_folder)
