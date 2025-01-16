@@ -181,9 +181,9 @@ class Network_Setup:
             self.logger.warning("The network is empty.\n")
         return self.network
 
-def main() -> None:
-    data_folder: str = 'data'
-    network_setup: Network_Setup = Network_Setup(data_folder)
+def main():
+    data_folder = 'hybrid_renewable_pypsa/data'
+    network_setup = Network_Setup(data_folder)
     network_setup.setup_network()
     network: pypsa.Network = network_setup.get_network()
     logger: Any = Logger_Setup.setup_logger('Main')

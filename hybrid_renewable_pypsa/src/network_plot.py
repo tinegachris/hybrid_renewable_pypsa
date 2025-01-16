@@ -145,6 +145,6 @@ class Network_Plot:
     self.plot_network()
 
 if __name__ == '__main__':
-  data_folder = 'data'
-  network_plotter = Network_Plot(data_folder)
-  network_plotter.main()
+    data_folder = 'hybrid_renewable_pypsa/data'
+    network_plotter = Network_Plot(data_folder)
+    network_plotter.main()

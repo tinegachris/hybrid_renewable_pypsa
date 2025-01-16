@@ -1,0 +1,24 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [
+    { include = "hybrid_renewable_pypsa" }
+]
+name = "Hybrid Renewable PyPSA Network Analysis"
+version = "0.1.0"
+description = "Analysis of a hybrid renewable energy network using PyPSA (Python for Power System Analysis)"
+authors = ["Chrispine Tinega <hello@chrispinetinega.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+pypsa = "^0.32.0"
+pandas = "^2.2.3"
+matplotlib = "^3.10.0"
+cartopy = "^0.24.1"
+numpy = "<2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+sphinx = "^8.1.3"
