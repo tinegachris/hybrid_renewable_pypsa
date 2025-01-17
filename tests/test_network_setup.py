@@ -2,11 +2,11 @@ import pytest
 import pandas as pd
 from unittest.mock import MagicMock
 from hybrid_renewable_pypsa.src.network_setup import Network_Setup
-from hybrid_renewable_pypsa.src.data_loader import DataLoader
+from hybrid_renewable_pypsa.src.data_loader import Data_Loader
 
 @pytest.fixture
 def mock_data_loader():
-    data_loader = DataLoader('data')
+    data_loader = Data_Loader('data')
     data_loader.read_csv = MagicMock()
     return data_loader
 
