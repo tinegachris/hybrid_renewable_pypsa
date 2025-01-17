@@ -9,5 +9,7 @@ The static network components are defined in the following CSV files:
 - `loads.csv`
 - `storage_units.csv`
 - `lines.csv`
+- `transformers.csv`
+- `links.csv`
 
 For detailed information on these components, you can refer to the PyPSA documentation: [PyPSA Components](https://pypsa.readthedocs.io/en/latest/user-guide/components.html).
