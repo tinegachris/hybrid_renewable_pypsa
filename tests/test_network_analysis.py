@@ -8,25 +8,25 @@ from hybrid_renewable_pypsa.src.data_loader import Data_Loader
 def mock_data_loader():
   """Fixture for mocking Data_Loader."""
   data_loader = Data_Loader('data')
-  data_loader.read_csv = MagicMock(autospec=True)
+  data_loader.read_csv = MagicMock()
   return data_loader
 
 def create_mock_network():
   """Helper function to create a mocked network."""
-  network = MagicMock(autospec=True)
-  network.buses = MagicMock(autospec=True)
-  network.generators = MagicMock(autospec=True)
-  network.storage_units = MagicMock(autospec=True)
-  network.loads = MagicMock(autospec=True)
-  network.lines = MagicMock(autospec=True)
-  network.transformers = MagicMock(autospec=True)
-  network.links = MagicMock(autospec=True)
-  network.consistency_check = MagicMock(autospec=True)
-  network.pf = MagicMock(autospec=True)
-  network.optimize = MagicMock(autospec=True)
-  network.lines_t = MagicMock(autospec=True)
-  network.buses_t = MagicMock(autospec=True)
-  network.transformers_t = MagicMock(autospec=True)
+  network = MagicMock()
+  network.buses = MagicMock()
+  network.generators = MagicMock()
+  network.storage_units = MagicMock()
+  network.loads = MagicMock()
+  network.lines = MagicMock()
+  network.transformers = MagicMock()
+  network.links = MagicMock()
+  network.consistency_check = MagicMock()
+  network.pf = MagicMock()
+  network.optimize = MagicMock()
+  network.lines_t = MagicMock()
+  network.buses_t = MagicMock()
+  network.transformers_t = MagicMock()
   return network
 
 @pytest.fixture

@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-from data_loader import Data_Loader
-from network_setup import Network_Setup
-from logger_setup import Logger_Setup
+from hybrid_renewable_pypsa.src.data_loader import Data_Loader
+from hybrid_renewable_pypsa.src.network_setup import Network_Setup
+from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
 from matplotlib.axes import Axes
 
 class Network_Plot:

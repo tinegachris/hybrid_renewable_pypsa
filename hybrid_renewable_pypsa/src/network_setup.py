@@ -1,7 +1,7 @@
 import pypsa
 import pandas as pd
-from data_loader import Data_Loader
-from logger_setup import Logger_Setup
+from hybrid_renewable_pypsa.src.data_loader import Data_Loader
+from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
 from typing import Any
 
 class Network_Setup:
@@ -114,7 +114,7 @@ class Network_Setup:
             r=row['r_per_length'] * row['length'],
             x=row['x_per_length'] * row['length'],
             capital_cost=row.get('capital_cost', 0.0),
-            carrier=row.get('carrier', '')
+            carrier=row.get('carrier', 'electricity')
         )
 
     def _add_transformers(self) -> None:
@@ -152,7 +152,7 @@ class Network_Setup:
             maintenance_cost=0.0,
             status=True,
             control_type='',
-            carrier=''
+            carrier='electricity'
         )
 
     def _add_loads(self) -> None:
@@ -165,9 +165,13 @@ class Network_Setup:
         self.logger.info("Loads added successfully!\n")
 
     def _add_load(self, load: pd.Series) -> None:
+        p_set_values = [float(x) for x in load.get('p_set', '').split(',')]
+        if len(p_set_values) != len(self.network.snapshots):
+            raise ValueError(f"Length of p_set values ({len(p_set_values)}) does not match length of snapshots ({len(self.network.snapshots)})")
+        p_set = pd.Series(p_set_values, index=self.network.snapshots)
         self.network.add("Load", load['name'],
             bus=load.get('bus', ''),
-            p_set=pd.Series([float(x) for x in load.get('p_set', '').split(',')], index=self.network.snapshots),
+            p_set=p_set,
             q_set=pd.Series([float(x) for x in load.get('q_set', '').split(',')], index=self.network.snapshots),
             p_min=load.get('p_min', 0.0),
             p_max=load.get('p_max', 0.0),
