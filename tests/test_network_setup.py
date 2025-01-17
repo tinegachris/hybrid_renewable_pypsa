@@ -6,32 +6,27 @@ from hybrid_renewable_pypsa.src.data_loader import Data_Loader
 
 @pytest.fixture
 def mock_data_loader():
-    data_loader = Data_Loader('data')
+    """Fixture for mocking the DataLoader."""
+    data_loader = Data_Loader('hybrid_renewable_pypsa/data')
     data_loader.read_csv = MagicMock()
     return data_loader
 
 @pytest.fixture
 def network_setup(mock_data_loader):
-    network_setup = Network_Setup('data')
+    """Fixture for setting up the NetworkSetup with a mocked DataLoader."""
+    network_setup = Network_Setup('hybrid_renewable_pypsa/data')
     network_setup.data_loader = mock_data_loader
     return network_setup
 
-def test_add_buses(network_setup, mock_data_loader):
-    """Test adding buses to the network."""
-    mock_data_loader.read_csv.return_value = pd.DataFrame({
+@pytest.mark.parametrize("method, data, index", [
+    ("_add_buses", {
         'name': ['bus1', 'bus2'],
         'v_nom': [110, 220],
         'x': [0, 1],
         'y': [0, 1],
         'carrier': ['AC', 'DC']
-    })
-    network_setup._add_buses()
-    assert 'bus1' in network_setup.network.buses.index
-    assert 'bus2' in network_setup.network.buses.index
-
-def test_add_generators(network_setup, mock_data_loader):
-    """Test adding generators to the network."""
-    mock_data_loader.read_csv.return_value = pd.DataFrame({
+    }, ['bus1', 'bus2']),
+    ("_add_generators", {
         'name': ['gen1', 'gen2'],
         'bus': ['bus1', 'bus2'],
         'control': ['PQ', 'PV'],
@@ -41,14 +36,8 @@ def test_add_generators(network_setup, mock_data_loader):
         'marginal_cost': [10, 20],
         'p_max_pu': [1.0, 1.0],
         'p_min_pu': [0.0, 0.0]
-    })
-    network_setup._add_generators()
-    assert 'gen1' in network_setup.network.generators.index
-    assert 'gen2' in network_setup.network.generators.index
-
-def test_add_storage_units(network_setup, mock_data_loader):
-    """Test adding storage units to the network."""
-    mock_data_loader.read_csv.return_value = pd.DataFrame({
+    }, ['gen1', 'gen2']),
+    ("_add_storage_units", {
         'name': ['storage1', 'storage2'],
         'bus': ['bus1', 'bus2'],
         'p_nom': [50, 100],
@@ -63,14 +52,8 @@ def test_add_storage_units(network_setup, mock_data_loader):
         'cyclic_state_of_charge': [True, False],
         'state_of_charge_min': [0.1, 0.2],
         'state_of_charge_max': [0.9, 0.95]
-    })
-    network_setup._add_storage_units()
-    assert 'storage1' in network_setup.network.storage_units.index
-    assert 'storage2' in network_setup.network.storage_units.index
-
-def test_add_lines(network_setup, mock_data_loader):
-    """Test adding lines to the network."""
-    mock_data_loader.read_csv.return_value = pd.DataFrame({
+    }, ['storage1', 'storage2']),
+    ("_add_lines", {
         'name': ['line1', 'line2'],
         'bus0': ['bus1', 'bus2'],
         'bus1': ['bus3', 'bus4'],
@@ -81,14 +64,8 @@ def test_add_lines(network_setup, mock_data_loader):
         's_nom': [100, 200],
         'type': ['overhead', 'underground'],
         'capital_cost': [10000, 20000]
-    })
-    network_setup._add_lines()
-    assert 'line1' in network_setup.network.lines.index
-    assert 'line2' in network_setup.network.lines.index
-
-def test_add_transformers(network_setup, mock_data_loader):
-    """Test adding transformers to the network."""
-    mock_data_loader.read_csv.return_value = pd.DataFrame({
+    }, ['line1', 'line2']),
+    ("_add_transformers", {
         'name': ['transformer1', 'transformer2'],
         'bus0': ['bus1', 'bus2'],
         'bus1': ['bus3', 'bus4'],
@@ -101,14 +78,8 @@ def test_add_transformers(network_setup, mock_data_loader):
         'tap_step': [0.01, 0.01],
         'efficiency': [0.98, 0.99],
         'capital_cost': [5000, 10000]
-    })
-    network_setup._add_transformers()
-    assert 'transformer1' in network_setup.network.transformers.index
-    assert 'transformer2' in network_setup.network.transformers.index
-
-def test_add_links(network_setup, mock_data_loader):
-    """Test adding links to the network."""
-    mock_data_loader.read_csv.return_value = pd.DataFrame({
+    }, ['transformer1', 'transformer2']),
+    ("_add_links", {
         'name': ['link1', 'link2'],
         'bus0': ['bus1', 'bus2'],
         'bus1': ['bus3', 'bus4'],
@@ -127,18 +98,12 @@ def test_add_links(network_setup, mock_data_loader):
         'ramp_down': [10, 20],
         'maintenance_cost': [5, 10],
         'control_type': ['type1', 'type2']
-    })
-    network_setup._add_links()
-    assert 'link1' in network_setup.network.links.index
-    assert 'link2' in network_setup.network.links.index
-
-def test_add_loads(network_setup, mock_data_loader):
-    """Test adding loads to the network."""
-    mock_data_loader.read_csv.return_value = pd.DataFrame({
+    }, ['link1', 'link2']),
+    ("_add_loads", {
         'name': ['load1', 'load2'],
         'bus': ['bus1', 'bus2'],
-        'p_set': ['1.0,2.0', '3.0,4.0'],
-        'q_set': ['0.5,1.0', '1.5,2.0'],
+        'p_set': [','.join(['1.0'] * 24), ','.join(['2.0'] * 24)],
+        'q_set': [','.join(['0.5'] * 24), ','.join(['1.0'] * 24)],
         'p_min': [0.0, 0.0],
         'p_max': [10.0, 20.0],
         'scaling_factor': [1.0, 1.0],
@@ -146,7 +111,11 @@ def test_add_loads(network_setup, mock_data_loader):
         'control_type': ['type1', 'type2'],
         'response_time': [0.1, 0.2],
         'priority': [1, 2]
-    })
-    network_setup._add_loads()
-    assert 'load1' in network_setup.network.loads.index
-    assert 'load2' in network_setup.network.loads.index
+    }, ['load1', 'load2'])
+])
+def test_network_setup_methods(network_setup, mock_data_loader, method, data, index):
+    """Parameterized test for adding components to the network."""
+    mock_data_loader.read_csv.return_value = pd.DataFrame(data)
+    getattr(network_setup, method)()
+    for item in index:
+        assert item in getattr(network_setup.network, method.split('_')[1]).index

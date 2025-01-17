@@ -30,7 +30,7 @@ class Network_Analysis:
   def _run_consistency_check(self):
     """Check the consistency of the network."""
     self.logger.info("Running consistency check...\n")
-    self.network.consistency_check()
+    self.network_setup.network.consistency_check()
     self.logger.info("Consistency check completed successfully!\n")
 
   def _run_pf(self):

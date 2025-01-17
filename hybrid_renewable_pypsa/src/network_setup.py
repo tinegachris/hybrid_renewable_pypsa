@@ -165,9 +165,13 @@ class Network_Setup:
         self.logger.info("Loads added successfully!\n")
 
     def _add_load(self, load: pd.Series) -> None:
+        p_set_values = [float(x) for x in load.get('p_set', '').split(',')]
+        if len(p_set_values) != len(self.network.snapshots):
+            raise ValueError(f"Length of p_set values ({len(p_set_values)}) does not match length of snapshots ({len(self.network.snapshots)})")
+        p_set = pd.Series(p_set_values, index=self.network.snapshots)
         self.network.add("Load", load['name'],
             bus=load.get('bus', ''),
-            p_set=pd.Series([float(x) for x in load.get('p_set', '').split(',')], index=self.network.snapshots),
+            p_set=p_set,
             q_set=pd.Series([float(x) for x in load.get('q_set', '').split(',')], index=self.network.snapshots),
             p_min=load.get('p_min', 0.0),
             p_max=load.get('p_max', 0.0),
