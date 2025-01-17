@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from logger_setup import Logger_Setup
+from .logger_setup import Logger_Setup
 
 class Data_Loader:
     def __init__(self, data_folder):

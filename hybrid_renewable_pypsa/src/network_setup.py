@@ -1,7 +1,7 @@
 import pypsa
 import pandas as pd
-from data_loader import Data_Loader
-from logger_setup import Logger_Setup
+from hybrid_renewable_pypsa.src.data_loader import Data_Loader
+from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
 from typing import Any
 
 class Network_Setup:

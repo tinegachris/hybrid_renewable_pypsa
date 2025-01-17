@@ -1,6 +1,6 @@
-from network_setup import Network_Setup
-from data_loader import Data_Loader
-from logger_setup import Logger_Setup
+from hybrid_renewable_pypsa.src.network_setup import Network_Setup
+from hybrid_renewable_pypsa.src.data_loader import Data_Loader
+from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
 
 class Network_Analysis:
   """
@@ -72,6 +72,6 @@ class Network_Analysis:
     self.logger.info(f"Total losses: {line_losses.sum().sum() + bus_losses.sum() + transformer_losses.sum().sum()}")
 
 if __name__ == '__main__':
-  data_folder = 'data'
+  data_folder = 'hybrid_renewable_pypsa/data'
   network_analysis = Network_Analysis(data_folder)
   network_analysis.analyze_network()
