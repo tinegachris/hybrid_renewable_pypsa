@@ -114,7 +114,7 @@ class Network_Setup:
             r=row['r_per_length'] * row['length'],
             x=row['x_per_length'] * row['length'],
             capital_cost=row.get('capital_cost', 0.0),
-            carrier=row.get('carrier', '')
+            carrier=row.get('carrier', 'electricity')
         )
 
     def _add_transformers(self) -> None:
@@ -152,7 +152,7 @@ class Network_Setup:
             maintenance_cost=0.0,
             status=True,
             control_type='',
-            carrier=''
+            carrier='electricity'
         )
 
     def _add_loads(self) -> None:

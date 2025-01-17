@@ -117,5 +117,6 @@ def test_network_setup_methods(network_setup, mock_data_loader, method, data, in
     """Parameterized test for adding components to the network."""
     mock_data_loader.read_csv.return_value = pd.DataFrame(data)
     getattr(network_setup, method)()
+    component_type = method.split('_')[1]
     for item in index:
-        assert item in getattr(network_setup.network, method.split('_')[1]).index
+        assert item in getattr(network_setup.network, component_type).index
