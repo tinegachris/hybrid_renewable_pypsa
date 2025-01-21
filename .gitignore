@@ -41,3 +41,6 @@ VS Code
 
 # Jupyter Notebook
 .ipynb_checkpoints/
+
+# sphinx-build
+_build/
