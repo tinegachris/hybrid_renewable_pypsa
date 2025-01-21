@@ -43,4 +43,22 @@ To install Hybrid Renewable PyPSA, follow these steps:
   poetry run pytest
   ```
 
-You are now ready to use Hybrid Renewable PyPSA!
+Generating Documentation
+------------------------
+
+To generate the HTML documentation using Sphinx, follow these steps:
+
+1. **Navigate to the `docs` directory**:
+   ```
+   cd docs
+   ```
+
+2. **Run Sphinx to build the HTML documentation**:
+   ```
+   sphinx-build -b html . _build/html
+   ```
+
+3. **Open the generated documentation**:
+   Open the `_build/html/index.html` file in your web browser to view the documentation.
+
+You are now ready to use Hybrid Renewable PyPSA and view its documentation!
