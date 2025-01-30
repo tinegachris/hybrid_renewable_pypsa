@@ -1,0 +1,4 @@
+constraint_id,time,value
+temp_limit,2024-01-01 12:00,0.9
+temp_limit,2024-01-01 13:00,0.85
+temp_limit,2024-01-01 14:00,0.8

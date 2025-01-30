@@ -1,0 +1,4 @@
+component_id,constraint_type,min_value,max_value
+Generator_1,p_max_pu,0.2,1.0
+Battery_1,state_of_charge,0.2,0.9
+Line_1,loading,0.0,0.95
