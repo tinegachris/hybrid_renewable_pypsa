@@ -1,0 +1,6 @@
+type,ramp_limit_up,ramp_limit_down,min_up_time,min_down_time,startup_cost
+gas_turbine,0.3,0.3,2,2,500
+diesel,0.4,0.4,1,1,200
+solar_pv,1.0,1.0,0,0,0
+wind_turbine,0.5,0.5,0,0,0
+hydro,0.2,0.2,4,4,1000

@@ -1,4 +1,5 @@
-vector_group,application,typical_impedance
-Dyn11,Distribution,4-6%
-YNd11,Transmission,10-15%
-Yy0,GeneratorStep-up,12-18%
+type,typical_impedance,x_r_ratio,cooling_types,insulation_life
+oil_cooled,6.0,15,"ONAN,ONAF",30
+dry_type,5.5,12,"AN,AF",25
+cast_resin,6.5,18,"AN",20
+gas_insulated,7.0,20,"SF6",35
