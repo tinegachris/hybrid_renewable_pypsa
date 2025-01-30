@@ -1,0 +1,99 @@
+
+### generator.csv
+| Column          | Description                                                                 |
+|-----------------|-----------------------------------------------------------------------------|
+| name            | Unique name of the generator.                                               |
+| bus             | The bus to which the generator is connected.                                |
+| control         | Control mode (e.g., PQ for active/reactive power control, Slack for slack bus). |
+| p_nom           | Nominal power capacity of the generator (in kW or MW).                      |
+| efficiency      | Efficiency of the generator (ratio of output power to input energy).        |
+| capital_cost    | Capital cost of the generator (in $/kW or $/MW).                            |
+| op_cost         | Operational cost of the generator (in $/kWh or $/MWh).                      |
+| p_max_pu        | Maximum power output as a fraction of p_nom.                                |
+| p_min_pu        | Minimum power output as a fraction of p_nom.                                |
+| marginal_cost   | Marginal cost of generation (in $/kWh or $/MWh).                            |
+| type            | Type of generator (e.g., solar, hydro, grid).                               |
+| ramp_limit_up   | Maximum rate at which the generator can increase output (p.u. per hour).    |
+| ramp_limit_down | Maximum rate at which the generator can decrease output (p.u. per hour).    |
+| min_up_time     | Minimum time the generator must remain on after starting (in hours).        |
+| min_down_time   | Minimum time the generator must remain off after stopping (in hours).       |
+| startup_cost    | Cost associated with starting the generator (in $).                         |
+| shutdown_cost   | Cost associated with shutting down the generator (in $).                    |
+| carrier         | Energy carrier (e.g., solar, hydro, electricity).                           |
+
+### lines.csv
+| Column          | Description                                                                 |
+|-----------------|-----------------------------------------------------------------------------|
+| name            | Unique name of the transmission line.                                       |
+| bus0            | Starting bus of the line.                                                   |
+| bus1            | Ending bus of the line.                                                     |
+| length          | Length of the line in kilometers (km).                                      |
+| r_per_length    | Resistance per unit length (Ω/km).                                          |
+| x_per_length    | Reactance per unit length (Ω/km).                                           |
+| c_per_length    | Capacitance per unit length (F/km).                                         |
+| s_nom           | Nominal apparent power capacity of the line (in kVA or MVA).                |
+| capital_cost    | Capital cost of the line (in $/km).                                         |
+| carrier         | Energy carrier (e.g., electricity).                                         |
+| type            | Type of transmission line (e.g., overhead, underground).                    |
+| max_i_ka        | Maximum current capacity of the line in kiloamperes (kA).                   |
+| terrain_factor  | Factor to account for terrain difficulty (e.g., 1.0 for flat terrain).      |
+| temperature     | Operating temperature of the line in degrees Celsius (°C).                  |
+| voltage_level   | Voltage level of the line in volts (V).                                     |
+
+### links.csv
+| Column                   | Description                                                                 |
+|--------------------------|-----------------------------------------------------------------------------|
+| name                     | Unique name of the link.                                                    |
+| bus0                     | Starting bus of the link.                                                   |
+| bus1                     | Ending bus of the link.                                                     |
+| p_nom                    | Nominal power capacity of the link (in kW or MW).                           |
+| efficiency               | Efficiency of the link (ratio of output power to input power).              |
+| capital_cost             | Capital cost of the link (in $).                                            |
+| transformer_type         | Indicates if the link is a transformer (True/False).                        |
+| p_min_pu                 | Minimum power output as a fraction of p_nom.                                |
+| p_max_pu                 | Maximum power output as a fraction of p_nom.                                |
+| reactive_power_capacity  | Maximum reactive power capacity (in kVAR or MVAR).                          |
+| r                        | Resistance of the link (in Ω).                                              |
+| x                        | Reactance of the link (in Ω).                                               |
+| startup_cost             | Cost associated with starting the link (in $).                              |
+| shutdown_cost            | Cost associated with shutting down the link (in $).                         |
+| ramp_up                  | Maximum rate at which the link can increase output (in % of p_nom per hour).|
+| ramp_down                | Maximum rate at which the link can decrease output (in % of p_nom per hour).|
+| maintenance_cost         | Annual maintenance cost of the link (in $).                                 |
+| status                   | Operational status of the link (1 for active, 0 for inactive).               |
+| control_type             | Control mode of the link (e.g., constant_power, PQ).                        |
+| carrier                  | Energy carrier (e.g., electricity).                                         |
+| type                     | Type of link (e.g., inverter, transformer).                                  |
+| max_i_ka                 | Maximum current capacity of the link in kiloamperes (kA).                   |
+| voltage_level_0          | Voltage level at bus0 in volts (V).                                         |
+| voltage_level_1          | Voltage level at bus1 in volts (V).                                         |
+
+### loads.csv
+| Column | Description           |
+|--------|-----------------------|
+| name   | Unique name of the load. |
+
+### storage_units.csv
+| Column                   | Description                              | Units   | Example     |
+|--------------------------|------------------------------------------|---------|-------------|
+| type                     | Storage technology type                  | -       | lithium_ion |
+| self_discharge           | Daily self-discharge rate                | %/day   | 0.5         |
+| standing_loss            | Idle energy losses                       | %/hour  | 0.1         |
+| cycle_life               | Full cycle lifespan                      | cycles  | 5000        |
+| degradation_per_cycle    | Capacity loss per cycle                  | %/cycle | 0.002       |
+| capital_cost_power       | Power conversion system cost             | $/kW    | 300         |
+| capital_cost_energy      | Energy storage cost                      | $/kWh   | 200         |
+| ramp_limit_charge        | Max charge rate change                   | p.u./min| 1.0         |
+| temperature_coefficient  | Efficiency temp dependency               | %/°C    | -0.5        |
+
+### transformers.csv
+| Column                | Description                              | Example Value                    |
+|-----------------------|------------------------------------------|----------------------------------|
+| cooling               | Cooling system type                      | ONAN (Oil Natural Air Natural)   |
+| vector_group          | Winding connection configuration         | Dyn11 (Delta-star)               |
+| per_unit_impedance    | Short-circuit impedance (% of Z_base)    | 6%                               |
+| x_r_ratio             | Reactance/Resistance ratio               | 15                               |
+| no_load_loss          | Iron/core losses at no load (W)          | 1500                             |
+| load_loss             | Copper/winding losses at full load (W)   | 8000                             |
+| insulation_type       | Insulation material class                | OilNatural                       |
+| temperature_rise      | Max temperature increase at full load (°C)| 65                               |
