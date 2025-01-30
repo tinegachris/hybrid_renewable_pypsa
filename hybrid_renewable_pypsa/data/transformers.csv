@@ -1,6 +1,6 @@
-name,bus0,bus1,s_nom,x,r,tap_position,tap_min,tap_max,tap_step,efficiency,capital_cost
-Transformer_Load,Main_AC_415V,Load_AC_415V,1000,0.05,0.01,1,0.9,1.1,0.01,0.95,1000
-Transformer_Grid,Grid_IN_AC_33kV,Grid_IN_AC_415V,4000,0.1,0.01,1,0.9,1.1,0.01,0.98,2000
-Transformer_Hydro_Step_Up,Hydro_OUT_AC_415V,Hydro_OUT_AC_11kV,1500,0.06,0.015,1,0.9,1.1,0.01,0.98,1800
-Transformer_Hydro_Step_Down,Hydro_IN_AC_11kV,Hydro_IN_AC_415V,1500,0.07,0.02,1,0.9,1.1,0.01,0.98,1800
-Transformer_Battery,BAT_AC_800V,BAT_AC_415V,2000,0.08,0.015,1,0.9,1.1,0.01,0.97,1500
+name,bus0,bus1,s_nom,voltage0,voltage1,phases,cooling,vector_group,per_unit_impedance,x_r_ratio,no_load_loss,load_loss,tap_neutral,tap_min,tap_max,tap_step,tap_position,efficiency,capital_cost,rated_frequency,insulation_type,temperature_rise,manufacturer,installation_year,maintenance_interval,weight,sound_level,description
+Transformer_Load,Main_AC_415V,Load_AC_415V,1000,415,415,3,ONAN,Dyn11,0.05,15,1500,8000,1,0.9,1.1,0.01,1,0.95,1000,50,OilNatural,65,ABB,2015,365,2500,55,415V Distribution transformer
+Transformer_Grid,Grid_IN_AC_33kV,Grid_IN_AC_415V,4000,33000,415,3,OFAF,YNd11,0.10,20,4500,20000,1,0.9,1.1,0.01,1,0.98,2000,50,OilForced,75,Siemens,2020,730,4500,65,33kV/415V Step-down transformer
+Transformer_Hydro_Step_Up,Hydro_OUT_AC_415V,Hydro_OUT_AC_11kV,1500,415,11000,3,ONAN,Dyn5,0.06,18,3000,12000,1,0.9,1.1,0.01,1,0.98,1800,50,Resin,60,Toshiba,2018,548,1800,60,Hydro generation step-up transformer
+Transformer_Hydro_Step_Down,Hydro_IN_AC_11kV,Hydro_IN_AC_415V,1500,11000,415,3,ONAF,Yy0,0.07,16,3200,13000,1,0.9,1.1,0.01,1,0.98,1800,50,OilNatural,70,GE,2019,365,2000,62,11kV/415V Step-down transformer
+Transformer_Battery,BAT_AC_800V,BAT_AC_415V,2000,800,415,3,DryType,Dyn11,0.08,12,2000,10000,1,0.9,1.1,0.01,1,0.97,1500,50,CastResin,55,Schneider,2021,182,1500,50,DC-coupled battery interface transformer
