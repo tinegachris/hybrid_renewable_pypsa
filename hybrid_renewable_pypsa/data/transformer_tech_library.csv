@@ -1,0 +1,4 @@
+vector_group,application,typical_impedance
+Dyn11,Distribution,4-6%
+YNd11,Transmission,10-15%
+Yy0,GeneratorStep-up,12-18%

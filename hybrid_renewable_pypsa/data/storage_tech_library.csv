@@ -1,0 +1,4 @@
+type,roundtrip_efficiency,cycle_life,degradation_per_cycle
+lithium_ion,0.85,5000,0.002
+lead_acid,0.75,2000,0.005
+flow_battery,0.70,10000,0.001
