@@ -1,4 +1,4 @@
-constraint_id,component_id,time_index,value,unit
+constraint_id,component_id,time,value,unit
 transformer_temp,Transformer_Grid,2024-01-01 12:00,0.9,per_unit
 transformer_temp,Transformer_Grid,2024-01-01 13:00,0.85,per_unit
 transformer_temp,Transformer_Grid,2024-01-01 14:00,0.8,per_unit

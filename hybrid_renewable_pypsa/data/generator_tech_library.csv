@@ -1,6 +1,7 @@
-type,ramp_limit_up_pct_per_min,ramp_limit_down_pct_per_min,min_up_time_hr,min_down_time_hr,startup_cost_eur,efficiency,fuel_type,co2_emissions_kg_mwh
-gas_turbine,30,30,2,2,500,0.35,natural_gas,450
-diesel,40,40,1,1,200,0.30,diesel,650
-solar_pv,100,100,0,0,0,0.18,solar,0
-wind_turbine,20,20,0,0,0,0.45,wind,0
-hydro,20,20,4,4,1000,0.85,water,0
+type,ramp_limit_up_pct_per_min,ramp_limit_down_pct_per_min,min_up_time_hr,min_down_time_hr,startup_cost_eur,efficiency,fuel_type,co2_emissions_kg_mwh,marginal_cost_eur_mwh
+solar_pv,100,100,0,0,0,1.0,solar,0,0.0
+hydro,30,30,0,0,500,0.85,water,0,20.0
+gas_turbine,20,20,2,2,2000,0.42,natural_gas,450,60.0
+diesel,40,40,1,1,500,0.38,diesel,650,80.0
+wind_turbine,50,50,0,0,0,1.0,wind,0,5.0
+grid,100,100,0,0,0,1.0,electricity,500,100.0
