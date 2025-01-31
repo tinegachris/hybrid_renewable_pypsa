@@ -1,7 +1,6 @@
 import pypsa
 import pandas as pd
 from typing import Dict, Optional
-import numpy as np
 from pathlib import Path
 from hybrid_renewable_pypsa.src.data_loader import Data_Loader
 from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
@@ -316,18 +315,33 @@ class NetworkSetup:
         self.logger.info("Applied all network constraints")
 
     def _apply_static_constraints(self, constraints: pd.DataFrame) -> None:
-        """Enforce component operational limits"""
+        """Enforce static operational limits with component type handling"""
         for _, constraint in constraints.iterrows():
-            component = self.network.get_components(constraint['component_id'])
-            for limit_type in ['min', 'max']:
-                value = constraint.get(f"{limit_type}_value")
-                if pd.notna(value):
-                    setattr(component, f"p_{limit_type}_pu", value)
+            component_type, component_name = constraint['component_id'].split('_', 1)
+            component_type = component_type.lower() + "s"  # Pluralize to match PyPSA attribute (Generator -> generators)
+
+            try:
+                component_df = getattr(self.network, component_type)
+                if pd.notna(constraint['min_value']):
+                    component_df.loc[component_name, constraint['constraint_type']] = constraint['min_value']
+                if pd.notna(constraint['max_value']):
+                    component_df.loc[component_name, constraint['constraint_type']] = constraint['max_value']
+
+            except AttributeError:
+                raise NetworkSetupError(
+                    f"Invalid component type: {component_type}",
+                    component="Constraint"
+                )
+            except KeyError:
+                raise NetworkSetupError(
+                    f"Component {component_name} not found in {component_type}",
+                    component=component_type
+                )
 
     def _apply_dynamic_constraints(self, constraints: pd.DataFrame, profiles: Dict) -> None:
         """Apply time-dependent operational constraints"""
         for _, constraint in constraints.iterrows():
-            component = self.network.get_components(constraint['component_id'])
+            component = self.network.components(constraint['component_id'])
             time_slice = self._parse_time_window(constraint)
 
             if constraint['constraint_type'] in profiles:
