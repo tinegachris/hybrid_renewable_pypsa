@@ -1,6 +1,7 @@
 import pypsa
 import pandas as pd
 from typing import Dict, Optional
+import numpy as np
 from pathlib import Path
 from hybrid_renewable_pypsa.src.data_loader import Data_Loader
 from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
@@ -46,6 +47,7 @@ class NetworkSetup:
                 pd.date_range("2024-01-01", periods=24*7, freq="h")
             )
             self.network.snapshot_weightings[:] = 1.0
+            self.logger.info("Temporal configuration successful")
         except Exception as e:
             raise NetworkSetupError(f"Temporal configuration failed: {str(e)}")
 
@@ -55,18 +57,25 @@ class NetworkSetup:
         self.network._meta = {
             "version": "1.3",
             "data_sources": ["synthetic", "NREL"],
-            "author": "Energy Systems Team"
+            "author": "Chrispine Tinega"
         }
+        self.logger.info("Network properties configured")
 
     def setup_network(self) -> pypsa.Network:
         """Orchestrate network build process with rollback support"""
         try:
             self._load_tech_libraries()
+            self.logger.info("Technology libraries loaded successfully")
             self._add_carriers()
+            self.logger.info("Energy carriers configured")
             self._add_components()
+            self.logger.info("Network components added")
             self._add_constraints()
+            self.logger.info("Network constraints applied")
             self._validate_network_topology()
+            self.logger.info("Network topology validated")
             self._finalize_network()
+            self.logger.info("Network setup complete")
             return self.network
         except Exception as e:
             self.logger.error(f"Network build failed: {str(e)}")
@@ -82,13 +91,14 @@ class NetworkSetup:
             ),
             'transformer': self._validate_tech_library(
                 self.data_loader.load_transformer_tech_library(),
-                required_columns=['typical_impedance', 'cooling_types']
+                required_columns=['typical_impedance_pct', 'cooling_types']
             ),
             'generator': self._validate_tech_library(
                 self.data_loader.load_generator_tech_library(),
-                required_columns=['ramp_limit_up', 'startup_cost']
+                required_columns=['ramp_limit_up_pct_per_min', 'ramp_limit_down_pct_per_min']
             )
         }
+        self.logger.info("Technology libraries loaded")
 
     def _validate_tech_library(self, df: pd.DataFrame, required_columns: list) -> pd.DataFrame:
         """Ensure technology libraries contain required data"""
@@ -197,10 +207,10 @@ class NetworkSetup:
                 p_nom=gen['p_nom'],
                 efficiency=gen['efficiency'],
                 marginal_cost=gen['marginal_cost'],
-                ramp_limit_up=tech_specs['ramp_limit_up'],
-                ramp_limit_down=tech_specs['ramp_limit_down'],
-                min_up_time=tech_specs['min_up_time'],
-                min_down_time=tech_specs['min_down_time'],
+                ramp_limit_up=tech_specs['ramp_limit_up_pct_per_min'],
+                ramp_limit_down=tech_specs['ramp_limit_down_pct_per_min'],
+                min_up_time=tech_specs['min_up_time_hr'],
+                min_down_time=tech_specs['min_down_time_hr'],
                 carrier=gen['carrier'],
                 p_max_pu=gen['p_max_pu'],
                 control=gen.get('control', 'PQ')
@@ -223,8 +233,6 @@ class NetworkSetup:
                 efficiency_dispatch=unit['efficiency_dispatch'],
                 cyclic_state_of_charge=unit['cyclic'],
                 standing_loss=unit.get('standing_loss', 0),
-                capital_cost_power=unit['capital_cost_power'],
-                capital_cost_energy=unit['capital_cost_energy'],
                 **tech_specs.to_dict()
             )
         self.logger.info(f"Added {len(storage_units)} storage units with degradation")
@@ -253,17 +261,14 @@ class NetworkSetup:
         bus0_volt = self.network.buses.at[link['bus0'], 'v_nom']
         bus1_volt = self.network.buses.at[link['bus1'], 'v_nom']
 
-        if abs(bus0_volt - link.get('voltage_level_0', 0)) > 1e-3:
-            raise NetworkSetupError(
-                f"Bus0 voltage mismatch: {bus0_volt} vs {link['voltage_level_0']}",
-                component="Link"
-            )
-
-        if abs(bus1_volt - link.get('voltage_level_1', 0)) > 1e-3:
-            raise NetworkSetupError(
-                f"Bus1 voltage mismatch: {bus1_volt} vs {link['voltage_level_1']}",
-                component="Link"
-            )
+        # Validate DC-AC voltage transformation for inverters
+        if link['type'] == 'inverter':
+            if bus0_volt <= 1500 and bus1_volt not in [415, 800]:
+                raise NetworkSetupError(
+                    f"Inverter {link['name']} has invalid voltage pairing: " +
+                    f"DC {bus0_volt}V to AC {bus1_volt}V",
+                    component="Link"
+                )
 
     def _add_loads(self) -> None:
         """Add time-varying loads with profile validation"""
@@ -284,11 +289,17 @@ class NetworkSetup:
             )
         self.logger.info(f"Added {len(loads)} loads with profile validation")
 
-    def _validate_load_profile(self, profile: pd.DataFrame, load_name: str) -> None:
-        """Ensure load profiles match network temporal structure"""
+    def _validate_load_profile(self, profile: pd.DataFrame, load_name: str):
+        """Strict index validation with name check"""
+        if profile.index.name != 'snapshot':
+            raise NetworkSetupError(
+                f"Profile index must be named 'snapshot', got '{profile.index.name}'",
+                component="Load"
+            )
+
         if not profile.index.equals(self.network.snapshots):
             raise NetworkSetupError(
-                f"Profile time index mismatch for load {load_name}",
+                f"Time index mismatch for load {load_name}",
                 component="Load"
             )
 
