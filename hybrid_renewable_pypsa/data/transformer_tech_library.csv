@@ -1,5 +1,5 @@
-type,typical_impedance,x_r_ratio,cooling_types,insulation_life
-oil_cooled,6.0,15,"ONAN,ONAF",30
-dry_type,5.5,12,"AN,AF",25
-cast_resin,6.5,18,"AN",20
-gas_insulated,7.0,20,"SF6",35
+type,typical_impedance_pct,x_r_ratio,cooling_types,insulation_life_years,efficiency_nominal,insulation_material
+oil_cooled,6.0,15,"ONAN,ONAF",30,0.98,mineral_oil
+dry_type,5.5,12,"AN,AF",25,0.97,epoxy_resin
+cast_resin,6.5,18,"AN",20,0.96,silicone_gel
+gas_insulated,7.0,20,"forced_gas",35,0.985,sf6_gas

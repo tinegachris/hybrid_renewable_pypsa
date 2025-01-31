@@ -1,6 +1,6 @@
-name,bus0,bus1,length,r_per_length,x_per_length,c_per_length,s_nom,capital_cost,carrier,type,max_i_ka,terrain_factor,temperature,voltage_level
-Line_Grid_to_AC_415V,Grid_IN_AC_415V,Main_AC_415V,1.0,0.05,0.2,0.01,4000,1000,electricity,overhead,0.5,1.0,25,415
-Line_Hydro_to_AC_415V,Hydro_IN_AC_415V,Main_AC_415V,1.0,0.05,0.2,0.01,1500,1000,electricity,overhead,0.3,1.0,25,415
-Line_Hydro_11kV,Hydro_OUT_AC_11kV,Hydro_IN_AC_11kV,5.0,0.15,0.4,0.02,1500,1200,electricity,underground,0.3,1.2,20,11000
-Line_Battery_to_AC_415V,BAT_AC_415V,Main_AC_415V,2.0,0.02,0.1,0.005,2000,500,electricity,overhead,0.4,1.0,25,415
-Line_Solar_to_AC_415V,PV_AC_415V,Main_AC_415V,1.5,0.03,0.15,0.008,3000,600,electricity,overhead,0.5,1.0,25,415
+name,bus0,bus1,length,r_per_length,x_per_length,c_per_length,s_nom,capital_cost,carrier,type,max_i_ka,terrain_factor,temperature,voltage_level,description
+Line_Grid_to_AC_415V,Grid_IN_AC_415V,Main_AC_415V,1.0,0.05,0.2,0.01,4000,1000,electricity,overhead,0.5,1.0,25,415,Grid to main AC connection
+Line_Hydro_to_AC_415V,Hydro_IN_AC_415V,Main_AC_415V,1.0,0.05,0.2,0.01,1500,1000,electricity,overhead,0.3,1.0,25,415,Hydro to main AC link
+Line_Hydro_11kV,Hydro_OUT_AC_11kV,Hydro_IN_AC_11kV,5.0,0.15,0.4,0.03,1500,1200,electricity,underground,0.3,1.2,20,11000,Underground hydro 11kV line
+Line_Battery_to_AC_415V,BAT_AC_415V,Main_AC_415V,2.0,0.02,0.1,0.005,2000,500,electricity,overhead,0.4,1.0,25,415,Battery to grid connection
+Line_Solar_to_AC_415V,PV_AC_415V,Main_AC_415V,1.5,0.03,0.15,0.008,3000,600,electricity,overhead,0.5,1.0,25,415,Solar PV to main grid

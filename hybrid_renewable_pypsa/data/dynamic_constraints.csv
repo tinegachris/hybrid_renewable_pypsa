@@ -1,6 +1,6 @@
 constraint_id,component_type,component_id,constraint_type,value,start_time,end_time
-ramp_gen1,generator,Generator_1,ramp_limit_up,0.2,,,
-ramp_gen1,generator,Generator_1,ramp_limit_down,0.3,,,
-minuptime_gen2,generator,Generator_2,min_up_time,4,,,
-storage_cyc,storage,Battery_1,cyclic_state_of_charge,True,,,
-load_shift1,load,Load_1,max_shift,2,08:00,20:00
+ramp_gen1,Generator,Generator_1,ramp_limit_up_per_hour,0.2,00:00,24:00
+ramp_gen1,Generator,Generator_1,ramp_limit_down_per_hour,0.3,00:00,24:00
+minuptime_gen2,Generator,Generator_2,min_up_time,4,,,
+storage_cyc,StorageUnit,Battery_1,cyclic_state_of_charge,True,,,
+load_shift1,Load,Load_1,shift_limit,0.2,08:00,20:00

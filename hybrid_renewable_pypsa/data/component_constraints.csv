@@ -1,4 +1,6 @@
-component_id,constraint_type,min_value,max_value
-Generator_1,p_max_pu,0.2,1.0
-Battery_1,state_of_charge,0.2,0.9
-Line_1,loading,0.0,0.95
+component_id,constraint_type,min_value,max_value,unit
+Generator_1,p_max_pu,0.2,1.0,per_unit
+Generator_1,p_min_pu,0.1,1.0,per_unit
+Battery_1,min_state_of_charge,0.2,,per_unit
+Battery_1,max_state_of_charge,,0.9,per_unit
+Line_1,max_loading,,0.95,per_unit
