@@ -31,10 +31,12 @@ class Data_Loader:
             self.logger.error(e)
         return pd.DataFrame()
 
-    def load_profile(self, profile_id):
+    def load_profile(self, profile_id: str) -> pd.DataFrame:
         try:
             file_path = self.data_folder / f'load_profiles/{profile_id}.csv'
-            return pd.read_csv(file_path, index_col='time', parse_dates=True)
+            df = pd.read_csv(file_path, index_col=0, parse_dates=True)
+            df.index.name = 'snapshot'
+            return df
         except FileNotFoundError:
             self.logger.error(f"Profile {profile_id} not found.")
         except pd.errors.EmptyDataError:
@@ -46,7 +48,10 @@ class Data_Loader:
 
     def load_dynamic_constraints(self) -> pd.DataFrame:
         try:
-            return pd.read_csv(self.data_folder / "dynamic_constraints.csv")
+            return pd.read_csv(
+                self.data_folder / "dynamic_constraints.csv",
+                skipinitialspace=True
+            )
         except FileNotFoundError:
             self.logger.error("File dynamic_constraints.csv not found.")
         except pd.errors.EmptyDataError:
@@ -58,8 +63,12 @@ class Data_Loader:
 
     def load_constraint_profiles(self) -> Dict[str, pd.Series]:
         try:
-            df = pd.read_csv(self.data_folder / "constraint_profiles.csv", parse_dates=["time"])
-            return {cid: grp.set_index("time")["value"] for cid, grp in df.groupby("constraint_id")}
+            df = pd.read_csv(
+                self.data_folder / "constraint_profiles.csv",
+                parse_dates=["time"],
+                index_col="time"
+            )
+            return {cid: grp["value"] for cid, grp in df.groupby("constraint_id")}
         except FileNotFoundError:
             self.logger.error("File constraint_profiles.csv not found.")
         except pd.errors.EmptyDataError:
