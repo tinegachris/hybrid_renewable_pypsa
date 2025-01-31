@@ -8,8 +8,8 @@ Path("data/load_profiles").mkdir(parents=True, exist_ok=True)
 # Configuration parameters
 START_DATE = "2024-01-01 00:00:00"
 HOURS = 24
-DAYS = 1
-TIMES = pd.date_range(START_DATE, periods=HOURS*DAYS, freq="h")
+DAYS = 7
+TIMES = pd.date_range(START_DATE, periods=HOURS*DAYS, freq="h", tz="UTC")
 POWER_FACTOR = 0.9  # Applies to all load types
 BASE_VOLTAGE = 0.415  # kV (415V system)
 TIME_ZONE = "UTC+00"
@@ -95,7 +95,7 @@ for profile_id, (p_set, q_set) in profiles.items():
     # Add header comment
     csv_header = (f"# time [{TIME_ZONE}], p_set [MW], q_set [MVAR] "
                   f"(power_factor={POWER_FACTOR})\n")
-    Path(f"data/load_profiles/{profile_id}.csv").write_text(csv_header + df.to_csv(index=False))
+    Path(f"hybrid_renewable_pypsa/data/load_profiles/{profile_id}.csv").write_text(csv_header + df.to_csv(index=False))
     
     # Add metadata
     load_type = profile_id.split("_")[0]
@@ -110,8 +110,8 @@ for profile_id, (p_set, q_set) in profiles.items():
     })
 
 # Save metadata file
-pd.DataFrame(metadata_records).to_csv("data/load_profiles_metadata.csv", index=False)
+pd.DataFrame(metadata_records).to_csv("hybrid_renewable_pypsa/data/load_profiles_metadata.csv", index=False)
 
 print("Successfully generated:")
-print(f"- {len(profiles)} load profiles in data/load_profiles/")
-print("- Metadata file: data/load_profiles_metadata.csv")
+print(f"- {len(profiles)} load profiles in hybrid_renewable_pypsa/data/load_profiles/")
+print("- Metadata file: hybrid_renewable_pypsa/data/load_profiles_metadata.csv")
