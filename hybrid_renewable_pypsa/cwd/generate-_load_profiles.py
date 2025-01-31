@@ -5,12 +5,14 @@ from pathlib import Path
 # Create directory structure
 Path("data/load_profiles").mkdir(parents=True, exist_ok=True)
 
-# Common parameters
-START_DATE = "2024-01-01"
+# Configuration parameters
+START_DATE = "2024-01-01 00:00:00"
 HOURS = 24
-DAYS = 1  # One week of data
+DAYS = 1
 TIMES = pd.date_range(START_DATE, periods=HOURS*DAYS, freq="h")
-POWER_FACTOR = 0.9  # For calculating reactive power from active power
+POWER_FACTOR = 0.9  # Applies to all load types
+BASE_VOLTAGE = 0.415  # kV (415V system)
+TIME_ZONE = "UTC+00"
 
 def add_daily_pattern(base_load, daily_curve, noise_level=0.1):
     """Add daily pattern with noise"""
@@ -19,83 +21,97 @@ def add_daily_pattern(base_load, daily_curve, noise_level=0.1):
     return np.clip(daily + noise, 0, None)
 
 def residential_load_profile():
-    """Generate residential load profile with morning/evening peaks"""
-    base = 200  # Base load in kW
+    """Generate residential load profile (MW) with morning/evening peaks"""
+    base = 0.2  # 200 kW base load
     daily_curve = np.array([
-        0.6, 0.5, 0.4, 0.4,  # Midnight-4AM
-        0.5, 0.6, 1.0, 1.2,  # 4AM-8AM (morning peak)
-        0.8, 0.7, 0.6, 0.6,  # 8AM-12PM
-        0.7, 0.8, 0.9, 1.0,  # 12PM-4PM
-        1.4, 1.6, 1.8, 2.0,  # 4PM-8PM (evening peak)
-        1.6, 1.4, 1.2, 1.0   # 8PM-Midnight
+        0.6, 0.5, 0.4, 0.4, 0.5, 0.6, 1.0, 1.2,
+        0.8, 0.7, 0.6, 0.6, 0.7, 0.8, 0.9, 1.0,
+        1.4, 1.6, 1.8, 2.0, 1.6, 1.4, 1.2, 1.0
     ])
     p_set = add_daily_pattern(base, daily_curve, 0.15)
     q_set = p_set * np.tan(np.arccos(POWER_FACTOR))
-    p_set_week = np.tile(p_set, DAYS)
-    q_set_week = np.tile(q_set, DAYS)
-    return p_set_week, q_set_week
+    return np.tile(p_set, DAYS), np.tile(q_set, DAYS)
 
 def commercial_load_profile():
-    """Generate commercial load profile with daytime peak"""
-    base = 300  # Base load in kW
+    """Generate commercial load profile (MW) with daytime peak"""
+    base = 0.3  # 300 kW base load
     daily_curve = np.array([
-        0.3, 0.3, 0.3, 0.3,  # Midnight-4AM
-        0.4, 0.5, 0.8, 1.0,  # 4AM-8AM
-        1.2, 1.4, 1.5, 1.6,  # 8AM-12PM
-        1.6, 1.7, 1.7, 1.6,  # 12PM-4PM (peak)
-        1.4, 1.2, 0.8, 0.6,  # 4PM-8PM
-        0.4, 0.3, 0.3, 0.3   # 8PM-Midnight
+        0.3, 0.3, 0.3, 0.3, 0.4, 0.5, 0.8, 1.0,
+        1.2, 1.4, 1.5, 1.6, 1.6, 1.7, 1.7, 1.6,
+        1.4, 1.2, 0.8, 0.6, 0.4, 0.3, 0.3, 0.3
     ])
     p_set = add_daily_pattern(base, daily_curve, 0.1)
     q_set = p_set * np.tan(np.arccos(POWER_FACTOR))
-    p_set_week = np.tile(p_set, DAYS)
-    q_set_week = np.tile(q_set, DAYS)
-    return p_set_week, q_set_week
+    return np.tile(p_set, DAYS), np.tile(q_set, DAYS)
 
 def industrial_load_profile():
-    """Generate industrial load profile with shift patterns"""
-    base = 400  # Base load in kW
+    """Generate industrial load profile (MW) with continuous operation"""
+    base = 0.4  # 400 kW base load
     daily_curve = np.array([
-        0.8, 0.8, 0.8, 0.8,  # Midnight-4AM
-        1.0, 1.0, 1.0, 1.0,  # 4AM-8AM
-        1.2, 1.2, 1.2, 1.2,  # 8AM-12PM
-        1.2, 1.2, 1.2, 1.2,  # 12PM-4PM
-        1.0, 1.0, 0.8, 0.8,  # 4PM-8PM
-        0.8, 0.8, 0.8, 0.8   # 8PM-Midnight
+        0.8, 0.8, 0.8, 0.8, 1.0, 1.0, 1.0, 1.0,
+        1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2,
+        1.0, 1.0, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8
     ])
     p_set = add_daily_pattern(base, daily_curve, 0.05)
-    q_set = p_set * np.tan(np.arccos(0.85))  # Industrial power factor
-    return p_set, q_set
+    q_set = p_set * np.tan(np.arccos(POWER_FACTOR))
+    return np.tile(p_set, DAYS), np.tile(q_set, DAYS)
 
-# Generate and save profiles
-profiles = {
-    # Residential
-    "residential_1": residential_load_profile(),
-    "residential_2": residential_load_profile(),
-    "residential_3": residential_load_profile(),
-    "residential_4": residential_load_profile(),
-    
-    # Commercial
-    "commercial_1": commercial_load_profile(),
-    "commercial_2": commercial_load_profile(),
-    "commercial_3": commercial_load_profile(),
-    
-    # Industrial
-    "industrial_1": industrial_load_profile(),
-    "industrial_2": industrial_load_profile(),
-    "industrial_3": industrial_load_profile()
+# Profile metadata descriptions
+PROFILE_METADATA = {
+    "residential_1": "Residential area 1",
+    "residential_2": "Residential area 2",
+    "residential_3": "Suburban housing",
+    "residential_4": "Urban apartments",
+    "commercial_1": "Commercial complex A",
+    "commercial_2": "Shopping district",
+    "commercial_3": "Office park",
+    "industrial_1": "Factory zone 1",
+    "industrial_2": "Factory zone 2",
+    "industrial_3": "Processing plant"
 }
 
-for profile_id, (p_set, q_set) in profiles.items():
-    if len(TIMES) == len(p_set) == len(q_set):
-        df = pd.DataFrame({
-            "time": TIMES,
-            "p_set": np.round(p_set, 1),
-            "q_set": np.round(q_set, 1)
-        })
-    else:
-        raise ValueError(f"Length mismatch: TIMES({len(TIMES)}), p_set({len(p_set)}), q_set({len(q_set)})")
-    df.to_csv(f"data/load_profiles/{profile_id}.csv", index=False)
+# Generate profiles and metadata
+metadata_records = []
+profiles = {
+    # Residential (4 profiles)
+    **{f"residential_{i+1}": residential_load_profile() for i in range(4)},
+    
+    # Commercial (3 profiles)
+    **{f"commercial_{i+1}": commercial_load_profile() for i in range(3)},
+    
+    # Industrial (3 profiles)
+    **{f"industrial_{i+1}": industrial_load_profile() for i in range(3)}
+}
 
-print("Generated load profiles:")
-print("\n".join(f"- data/load_profiles/{id}.csv" for id in profiles.keys()))
+# Save profiles and collect metadata
+for profile_id, (p_set, q_set) in profiles.items():
+    # Create profile CSV
+    df = pd.DataFrame({
+        "time": TIMES.strftime("%Y-%m-%d %H:%M:%S"),
+        "p_set": np.round(p_set, 4),  # MW
+        "q_set": np.round(q_set, 4)   # MVAr
+    })
+    
+    # Add header comment
+    csv_header = (f"# time [{TIME_ZONE}], p_set [MW], q_set [MVAR] "
+                  f"(power_factor={POWER_FACTOR})\n")
+    Path(f"data/load_profiles/{profile_id}.csv").write_text(csv_header + df.to_csv(index=False))
+    
+    # Add metadata
+    load_type = profile_id.split("_")[0]
+    metadata_records.append({
+        "profile_id": profile_id,
+        "load_type": load_type,
+        "voltage_kV": BASE_VOLTAGE,
+        "time_zone": TIME_ZONE,
+        "power_factor": POWER_FACTOR,
+        "data_source": "synthetic",
+        "description": PROFILE_METADATA[profile_id]
+    })
+
+# Save metadata file
+pd.DataFrame(metadata_records).to_csv("data/load_profiles_metadata.csv", index=False)
+
+print("Successfully generated:")
+print(f"- {len(profiles)} load profiles in data/load_profiles/")
+print("- Metadata file: data/load_profiles_metadata.csv")
