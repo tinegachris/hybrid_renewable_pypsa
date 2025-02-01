@@ -1,5 +1,6 @@
 import pypsa
 import pandas as pd
+import numpy as np
 from typing import Dict, Optional
 from pathlib import Path
 from hybrid_renewable_pypsa.src.data_loader import Data_Loader
@@ -311,7 +312,7 @@ class NetworkSetup:
         }
 
         self._apply_static_constraints(constraints['static'])
-        self._apply_dynamic_constraints(constraints['dynamic'], constraints['profiles'])
+        # self._apply_dynamic_constraints(constraints['dynamic'], constraints['profiles'])
         self.logger.info("Applied all network constraints")
 
     def _apply_static_constraints(self, constraints: pd.DataFrame) -> None:
@@ -325,7 +326,7 @@ class NetworkSetup:
 
         for _, constraint in constraints.iterrows():
             try:
-                component_type, component_name = constraint['component_id'].split('_', 1)
+                component_type = constraint['component_id'].split('_', 1)[0]
                 pypsa_component = COMPONENT_MAP[component_type]
                 component_df = getattr(self.network, pypsa_component)
 
@@ -334,50 +335,55 @@ class NetworkSetup:
                     if value := constraint.get(f"{limit_type}_value"):
                         component_df.loc[constraint['component_id'], f"p_{limit_type}_pu"] = float(value)
 
-            except KeyError as e:
+            except KeyError:
                 raise NetworkSetupError(f"Invalid component {constraint['component_id']}", component="Constraint")
 
     def _apply_dynamic_constraints(self, constraints: pd.DataFrame, profiles: Dict) -> None:
-        COMPONENT_MAP = {
-            'Generator': 'generators',
-            'StorageUnit': 'storage_units',
-            'Load': 'loads'
+        """Apply constraints with proper PyPSA time-series handling"""
+        COMPONENT_TIME_MAP = {
+            'Generator': ('generators', 'generators_t'),
+            'StorageUnit': ('storage_units', 'storage_units_t'),
+            'Load': ('loads', 'loads_t'),
+            'Line': ('lines', 'lines_t')
         }
 
         for _, constraint in constraints.iterrows():
+            component_type = constraint['component_type']
+            component_id = constraint['component_id']
+            constraint_type = constraint['constraint_type']
+            value = profiles.get(constraint['constraint_id'], constraint['value'])
+            time_slice = self._parse_time_window(constraint)
+
+            # Get component handlers
+            static_attr, time_attr = COMPONENT_TIME_MAP[component_type]
+            static_df = getattr(self.network, static_attr)
+
             try:
-                # Parse component type and name
-                component_type = constraint['component_type']
-                component_id = constraint['component_id']
-                pypsa_component = COMPONENT_MAP[component_type]
-
-                # Access component DataFrame
-                component_df = getattr(self.network, pypsa_component)
-                component = component_df.loc[component_id]
-
-                # Apply constraints
-                time_slice = self._parse_time_window(constraint)
-                constraint_value = profiles.get(constraint['constraint_id'], constraint['value'])
-
-                if constraint['constraint_type'] in component.index:
-                    component_df.loc[component_id, constraint['constraint_type']].loc[time_slice] = constraint_value
+                # Handle time-varying constraints
+                if hasattr(getattr(self.network, time_attr), constraint_type):
+                    time_series = getattr(getattr(self.network, time_attr), constraint_type)
+                    time_series.loc[time_slice, component_id] = value
+                # Handle static constraints
+                elif constraint_type in static_df.columns:
+                    static_df.loc[component_id, constraint_type] = value
                 else:
-                    raise NetworkSetupError(f"Invalid constraint type {constraint['constraint_type']}")
+                    raise NetworkSetupError(
+                        f"Invalid constraint {constraint_type} for {component_id}",
+                        component=component_type
+                    )
 
-            except KeyError as e:
-                raise NetworkSetupError(f"Component {component_id} not found", component=pypsa_component)
+            except KeyError:
+                raise NetworkSetupError(f"Component {component_id} not found", component=component_type)
 
     def _parse_time_window(self, constraint: pd.Series) -> slice:
-        """Convert time strings to snapshot indices"""
-        try:
-            start = pd.to_datetime(constraint['start_time']) if constraint['start_time'] else self.network.snapshots[0]
-            end = pd.to_datetime(constraint['end_time']) if constraint['end_time'] else self.network.snapshots[-1]
-            return slice(
-                self.network.snapshots.get_loc(start),
-                self.network.snapshots.get_loc(end)
-            )
-        except KeyError:
-            return slice(None, None)
+        """Convert to proper datetime slice"""
+        start = pd.to_datetime(constraint['start_time']) if pd.notna(constraint['start_time']) else None
+        end = pd.to_datetime(constraint['end_time']) if pd.notna(constraint['end_time']) else None
+
+        return self.network.snapshots.slice_indexer(
+            start=start,
+            end=end
+        )
 
     def _validate_network_topology(self) -> None:
         """Perform comprehensive network validation"""
