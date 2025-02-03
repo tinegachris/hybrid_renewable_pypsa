@@ -3,4 +3,4 @@ Generator_Solar_PV,p_max_pu,0.2,1.0,per_unit
 Generator_Solar_PV,p_min_pu,0.1,1.0,per_unit
 StorageUnit_Battery_Storage,min_state_of_charge,0.2,,per_unit
 StorageUnit_Battery_Storage,max_state_of_charge,,0.9,per_unit
-Line_Line_Grid_to_AC_415V,max_loading,,0.95,per_unit
+Line_Grid_to_AC_415V,max_loading,,0.95,per_unit
