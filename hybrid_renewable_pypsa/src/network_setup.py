@@ -403,15 +403,23 @@ class NetworkSetup:
 
         for comp_type, df in components.items():
             for name, comp in df.iterrows():
-                if comp.bus not in self.network.buses.index:
-                    raise NetworkSetupError(
-                        f"Component {name} connected to invalid bus {comp.bus}",
-                        component=comp_type
-                    )
+                buses = [comp['bus']] if comp_type != 'Link' else [comp['bus0'], comp['bus1']]
+                for bus in buses:
+                    if bus not in self.network.buses.index:
+                        raise NetworkSetupError(
+                            f"{comp_type} {name} connected to invalid bus {bus}",
+                            component=comp_type
+                        )
+        self.logger.info("Component connections validated")
 
     def _check_voltage_levels(self) -> None:
         """Validate voltage compatibility across connections"""
         for _, line in self.network.lines.iterrows():
+            if pd.isna(line['bus0']) or pd.isna(line['bus1']):
+                raise NetworkSetupError(
+                    f"Line {line.name} has NaN bus values: bus0={line.bus0}, bus1={line.bus1}",
+                    component="Line"
+                )
             bus0_v = self.network.buses.at[line.bus0, 'v_nom']
             bus1_v = self.network.buses.at[line.bus1, 'v_nom']
 
