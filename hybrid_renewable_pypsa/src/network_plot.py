@@ -38,6 +38,9 @@ class Network_Plot:
             self.logger.warning(f"Component type '{component_type}' not found in the network.")
             return
         for _, connection in self.network[component_type].iterrows():
+            if connection.bus0 not in self.network.buses.index or connection.bus1 not in self.network.buses.index:
+                self.logger.warning(f"Bus '{connection.bus0}' or '{connection.bus1}' not found in the network.")
+                continue
             bus0 = self.network.buses.loc[connection.bus0]
             bus1 = self.network.buses.loc[connection.bus1]
             ax.plot(
@@ -163,7 +166,7 @@ class Network_Plot:
     def main(self) -> None:
         """Main method to plot the network."""
         self.logger.info(f'Plotting {len(self.network.buses)} buses and {len(self.network.lines)} lines...')
-        self.plot_network(save_path="network_plot.png", show_map=True)
+        self.plot_network(save_path="hybrid_renewable_pypsa/results/network_plot.png", show_map=True)
 
 if __name__ == '__main__':
     data_folder = 'hybrid_renewable_pypsa/data'
