@@ -397,24 +397,31 @@ class Network_Setup:
         self.logger.info("Network topology validation passed")
 
     def _check_component_connections(self) -> None:
-        """Verify all components are connected to existing buses"""
-        components = {
-            'Generator': self.network.generators,
-            'Load': self.network.loads,
-            'StorageUnit': self.network.storage_units,
-            'Link': self.network.links
+        """Verify all components are connected to valid buses"""
+        component_map = {
+            # (Component Type, PyPSA DataFrame Name, Bus Columns)
+            'Generator': ('generators', ['bus']),
+            'Load': ('loads', ['bus']),
+            'StorageUnit': ('storage_units', ['bus']),
+            'Link': ('links', ['bus0', 'bus1'])
         }
 
-        for comp_type, df in components.items():
-            for name, comp in df.iterrows():
-                buses = [comp['bus']] if comp_type != 'Link' else [comp['bus0'], comp['bus1']]
-                for bus in buses:
-                    if bus not in self.network.buses.index:
-                        raise NetworkSetupError(
-                            f"{comp_type} {name} connected to invalid bus {bus}",
-                            component=comp_type
-                        )
-        self.logger.info("Component connections validated")
+        for comp_type, (df_name, bus_cols) in component_map.items():
+            try:
+                df = getattr(self.network, df_name)
+                for name, comp in df.iterrows():
+                    for bus_col in bus_cols:
+                        bus = comp[bus_col]
+                        if bus not in self.network.buses.index:
+                            raise NetworkSetupError(
+                                f"{comp_type} {name} connects to invalid bus {bus_col}={bus}",
+                                component=comp_type
+                            )
+            except AttributeError:
+                raise NetworkSetupError(
+                    f"PyPSA network missing {df_name} DataFrame",
+                    component=comp_type
+                )
 
     def _check_voltage_levels(self) -> None:
         """Validate voltage compatibility across connections"""
