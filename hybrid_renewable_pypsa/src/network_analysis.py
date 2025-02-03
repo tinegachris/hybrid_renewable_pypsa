@@ -1,4 +1,4 @@
-from hybrid_renewable_pypsa.src.network_setup import NetworkSetup
+from hybrid_renewable_pypsa.src.network_setup import Network_Setup
 from hybrid_renewable_pypsa.src.data_loader import Data_Loader
 from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
 from typing import Dict, Any

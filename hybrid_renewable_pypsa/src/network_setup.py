@@ -12,7 +12,7 @@ class NetworkSetupError(Exception):
         super().__init__(f"{component + ': ' if component else ''}{message}")
         self.component = component
 
-class NetworkSetup:
+class Network_Setup:
     """
     Advanced network configuration manager with:
     - Technology library integration
@@ -448,7 +448,7 @@ def main() -> None:
     """Main execution with performance monitoring"""
     try:
         data_folder = 'hybrid_renewable_pypsa/data'
-        network_setup = NetworkSetup(data_folder)
+        network_setup = Network_Setup(data_folder)
         network = network_setup.setup_network()
 
         logger = Logger_Setup.setup_logger('Main')
