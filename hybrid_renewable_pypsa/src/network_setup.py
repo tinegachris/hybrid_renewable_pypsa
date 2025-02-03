@@ -82,6 +82,10 @@ class Network_Setup:
             self._cleanup_resources()
             raise
 
+    def get_network(self) -> pypsa.Network:
+        """Retrieve the network object for external use"""
+        return self.network
+
     def _load_tech_libraries(self) -> None:
         """Load technology specifications with version checking"""
         self._tech_libraries = {
@@ -452,7 +456,7 @@ def main() -> None:
         network = network_setup.setup_network()
 
         logger = Logger_Setup.setup_logger('Main')
-        logger.info("\nNetwork Statistics:")
+        logger.info("\n\nNetwork Statistics:")
         logger.info(f"- Buses: {len(network.buses)}")
         logger.info(f"- Lines: {len(network.lines)}")
         logger.info(f"- Generators: {len(network.generators)}")
