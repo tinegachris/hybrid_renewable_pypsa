@@ -74,9 +74,9 @@ class Network_Setup:
             self.logger.info("Network constraints applied")
             self._validate_network_topology()
             self.logger.info("Network topology validated")
-            self._finalize_network()
-            self.logger.info("Network setup complete")
+            self.logger.info("\n\nNetwork setup complete")
             return self.network
+
         except Exception as e:
             self.logger.error(f"Network build failed: {str(e)}")
             self._cleanup_resources()
@@ -283,6 +283,10 @@ class Network_Setup:
 
     def _validate_link_voltages(self, link: pd.Series) -> None:
         """Verify link voltage compatibility with connected buses"""
+
+        if pd.isna(link['bus0']) or pd.isna(link['bus1']):
+            raise NetworkSetupError("Link has undefined bus connections", "Link")
+
         bus0_volt = self.network.buses.at[link['bus0'], 'v_nom']
         bus1_volt = self.network.buses.at[link['bus1'], 'v_nom']
 
@@ -414,6 +418,7 @@ class Network_Setup:
         """Perform comprehensive network validation"""
         self._check_component_connections()
         self._check_voltage_levels()
+        self._check_transformer_ratios()
         self.network.consistency_check()
         self.logger.info("Network topology validation passed")
 
@@ -462,14 +467,12 @@ class Network_Setup:
                     component="Line"
                 )
 
-    def _finalize_network(self) -> None:
-        """Final network preparation steps"""
-        self.network.lopf(
-            pyomo=False,
-            formulation="kirchhoff",
-            keep_files=False
-        )
-        self.logger.info("Network initialized for optimization")
+    def _check_transformer_ratios(self):
+        for _, trafo in self.network.transformers.iterrows():
+            bus0_v = self.network.buses.at[trafo.bus0, 'v_nom']
+            bus1_v = self.network.buses.at[trafo.bus1, 'v_nom']
+            if abs(trafo.tap_ratio - (bus1_v/bus0_v)) > 0.1:
+                self.logger.warning(f"Transformer {trafo.name} has suspicious tap ratio")
 
     def _cleanup_resources(self) -> None:
         """Release resources after failed build"""
