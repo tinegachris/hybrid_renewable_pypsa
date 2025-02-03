@@ -10,7 +10,12 @@ class Data_Loader:
         self.logger = Logger_Setup.setup_logger('DataLoader')
 
     def _sanitize_file_name(self, file_name):
-        allowed_files = {'buses.csv', 'generators.csv', 'storage_units.csv', 'loads.csv', 'lines.csv', 'transformers.csv', 'links.csv'}
+        allowed_files = {
+            'buses.csv', 'component_constraints.csv', 'constraint_profiles.csv', 'dynamic_constraints.csv',
+            'generator_tech_library.csv', 'generators.csv', 'line_types.csv', 'lines.csv', 'links.csv',
+            'load_profiles_metadata.csv', 'loads.csv', 'storage_tech_library.csv', 'storage_units.csv',
+            'transformer_tech_library.csv', 'transformers.csv'
+        }
         if file_name not in allowed_files:
             raise ValueError(f"Invalid file name: {file_name}")
         return file_name
