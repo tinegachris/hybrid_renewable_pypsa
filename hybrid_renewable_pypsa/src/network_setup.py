@@ -180,23 +180,44 @@ class Network_Setup:
         self.logger.info(f"Added {len(transformers)} transformers with technical specs")
 
     def _add_lines(self) -> None:
-        """Add transmission lines with thermal limits"""
+        """Add transmission lines with type-based parameters"""
         lines = self.data_loader.read_csv('lines.csv')
+        line_types = self.data_loader.read_csv('line_types.csv').set_index('name')
+
+        if not hasattr(self.network, 'line_types'):
+            self.network.line_types = line_types
+        else:
+            self.network.line_types = pd.concat([self.network.line_types, line_types])
+
         for _, line in lines.iterrows():
+            line_type = line.get('type', 'overhead')
+            if line_type not in line_types.index:
+                raise NetworkSetupError(
+                    f"Line {line['name']} uses undefined type: {line_type}",
+                    component="Line"
+                )
+
+            type_params = line_types.loc[line_type]
+
+            r = type_params['r_per_length'] * line['length']
+            x = type_params['x_per_length'] * line['length']
+            b = type_params['c_per_length'] * line['length'] * 1e-6  # μS/km to S
+
             self.network.add("Line",
                 name=line['name'],
                 bus0=line['bus0'],
                 bus1=line['bus1'],
-                r=line['r_per_length'] * line['length'],
-                x=line['x_per_length'] * line['length'],
-                b=line.get('c_per_length', 0) * line['length'] * 1e-6,  # μS/km to S
+                r=r,
+                x=x,
+                b=b,
                 s_nom=line['s_nom'],
                 capital_cost=line.get('capital_cost', 0),
-                terrain_factor=line.get('terrain_factor', 1.0),
-                max_i_ka=line.get('max_i_ka', 1.0),
-                type=line.get('type', 'overhead')
+                terrain_factor=type_params.get('terrain_factor', 1.0),
+                max_i_ka=type_params.get('max_i_ka', 1.0),
+                type=line_type
             )
-        self.logger.info(f"Added {len(lines)} lines with thermal constraints")
+
+        self.logger.info(f"Added {len(lines)} lines with type-based parameters")
 
     def _add_generators(self) -> None:
         """Add generators with technology-specific parameters"""
