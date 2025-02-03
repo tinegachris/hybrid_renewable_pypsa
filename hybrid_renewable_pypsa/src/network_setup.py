@@ -26,7 +26,8 @@ class Network_Setup:
         'DC': {'color': '#ff7f0e', 'co2_emissions': 0},
         'electricity': {'color': '#2ca02c', 'co2_emissions': 0.5},
         'hydro': {'color': '#17becf', 'co2_emissions': 0},
-        'solar': {'color': '#bcbd22', 'co2_emissions': 0}
+        'solar': {'color': '#bcbd22', 'co2_emissions': 0},
+        'DC_AC': {'color': '#9467bd', 'co2_emissions': 0}
     }
 
     def __init__(self, data_folder: str) -> None:
@@ -184,6 +185,15 @@ class Network_Setup:
         lines = self.data_loader.read_csv('lines.csv')
         line_types = self.data_loader.read_csv('line_types.csv').set_index('name')
 
+        required_columns = ['r_per_length', 'x_per_length', 'c_per_length']
+        line_types = line_types.assign(
+            **{col: line_types.get(col, 0.001) for col in required_columns}
+        )
+
+        line_types['mounting'] = line_types.get('mounting', 'overhead')
+        line_types['cross_section'] = line_types.get('cross_section', 150)  # mm²
+        line_types['i_nom'] = line_types.get('i_nom', 0.5)  # kA
+
         if not hasattr(self.network, 'line_types'):
             self.network.line_types = line_types
         else:
@@ -202,6 +212,12 @@ class Network_Setup:
             r = type_params['r_per_length'] * line['length']
             x = type_params['x_per_length'] * line['length']
             b = type_params['c_per_length'] * line['length'] * 1e-6  # μS/km to S
+
+            if r == 0 or x == 0:
+                raise NetworkSetupError(
+                    f"Line {line['name']} has zero impedance (r={r}, x={x})",
+                    component="Line"
+                )
 
             self.network.add("Line",
                 name=line['name'],
@@ -244,7 +260,15 @@ class Network_Setup:
 
     def _add_storage_units(self) -> None:
         """Add storage systems with degradation modeling"""
-        storage_units = self.data_loader.read_csv('storage_units.csv')
+        storage_units = self.data_loader.read_csv('storage_units.csv').fillna({
+            'p_min_pu': 0,
+            'standing_loss': 0,
+            'cyclic': True
+        })
+
+        if storage_units['p_nom'].le(0).any():
+            raise NetworkSetupError("Storage units must have positive p_nom", "StorageUnit")
+
         tech_lib = self._tech_libraries['storage']
 
         for _, unit in storage_units.iterrows():
@@ -419,6 +443,8 @@ class Network_Setup:
         self._check_component_connections()
         self._check_voltage_levels()
         self._check_transformer_ratios()
+        self._validate_line_parameters()
+        self._validate_storage_units()
         self.network.consistency_check()
         self.logger.info("Network topology validation passed")
 
@@ -468,11 +494,36 @@ class Network_Setup:
                 )
 
     def _check_transformer_ratios(self):
-        for _, trafo in self.network.transformers.iterrows():
+        """Strict ratio validation with exact nominal voltages"""
+        for name, trafo in self.network.transformers.iterrows():
             bus0_v = self.network.buses.at[trafo.bus0, 'v_nom']
             bus1_v = self.network.buses.at[trafo.bus1, 'v_nom']
-            if abs(trafo.tap_ratio - (bus1_v/bus0_v)) > 0.1:
-                self.logger.warning(f"Transformer {trafo.name} has suspicious tap ratio")
+            nominal_ratio = bus1_v / bus0_v
+            if not np.isclose(trafo.tap_ratio, nominal_ratio, rtol=0.01):
+                raise NetworkSetupError(
+                    f"Transformer {name} has invalid tap ratio {trafo.tap_ratio:.2f} "
+                    f"(expected {nominal_ratio:.2f} for {bus0_v}V→{bus1_v}V)",
+                    component="Transformer"
+                )
+
+    def _validate_line_parameters(self):
+        """Ensure line parameters are physically realistic"""
+        lines = self.network.lines
+        invalid = lines[(lines.r <= 0) | (lines.x <= 0)]
+        if not invalid.empty:
+            raise NetworkSetupError(
+                f"Lines with invalid impedance: {invalid.index.tolist()}",
+                component="Line"
+            )
+
+    def _validate_storage_units(self):
+        """Validate storage unit parameters"""
+        for name, su in self.network.storage_units.iterrows():
+            if su.max_hours <= 0:
+                raise NetworkSetupError(
+                    f"Storage {name} has invalid max_hours {su.max_hours}",
+                    component="StorageUnit"
+                )
 
     def _cleanup_resources(self) -> None:
         """Release resources after failed build"""
