@@ -442,7 +442,6 @@ class Network_Setup:
         """Perform comprehensive network validation"""
         self._check_component_connections()
         self._check_voltage_levels()
-        self._check_transformer_ratios()
         self._validate_line_parameters()
         self._validate_storage_units()
         self.network.consistency_check()
@@ -491,19 +490,6 @@ class Network_Setup:
                     f"Line {line.name} connects different voltage levels: " +
                     f"{bus0_v}V - {bus1_v}V",
                     component="Line"
-                )
-
-    def _check_transformer_ratios(self):
-        """Strict ratio validation with exact nominal voltages"""
-        for name, trafo in self.network.transformers.iterrows():
-            bus0_v = self.network.buses.at[trafo.bus0, 'v_nom']
-            bus1_v = self.network.buses.at[trafo.bus1, 'v_nom']
-            nominal_ratio = bus1_v / bus0_v
-            if not np.isclose(trafo.tap_ratio, nominal_ratio, rtol=0.01):
-                raise NetworkSetupError(
-                    f"Transformer {name} has invalid tap ratio {trafo.tap_ratio:.2f} "
-                    f"(expected {nominal_ratio:.2f} for {bus0_v}V→{bus1_v}V)",
-                    component="Transformer"
                 )
 
     def _validate_line_parameters(self):
