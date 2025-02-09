@@ -3,7 +3,10 @@ import numpy as np
 from pathlib import Path
 
 # Create directory structure
-Path("hybrid_renewable_pypsa/data/generator_profiles").mkdir(parents=True, exist_ok=True)
+profile_dir = Path("hybrid_renewable_pypsa/data/profiles/generator_profiles")
+metadata_path = Path("hybrid_renewable_pypsa/data/metadata/generator_profiles_metadata.csv")
+profile_dir.mkdir(parents=True, exist_ok=True)
+metadata_path.parent.mkdir(parents=True, exist_ok=True)
 
 # Configuration parameters
 START_DATE = "2024-01-01 00:00:00"
@@ -33,7 +36,7 @@ def generate_hydro_profile():
     noise = np.random.normal(0, variation, len(profile))
     return np.clip(profile + noise, 0, 1)
 
-# Generate solar and hydro profiles
+# Generate profiles
 solar_profile = generate_solar_profile()
 hydro_profile = generate_hydro_profile()
 
@@ -42,21 +45,25 @@ solar_df = pd.DataFrame({
     "time": TIMES.strftime("%Y-%m-%d %H:%M:%S"),
     "p_max_pu": np.round(solar_profile, 4)  # p.u.
 })
-solar_csv_header = f"# time [{TIME_ZONE}], p_max_pu [p.u.] (solar generation profile)\n"
-Path("hybrid_renewable_pypsa/data/profiles/generator_profiles/solar-p_max_pu.csv").write_text(
-    solar_csv_header + solar_df.to_csv(index=False)
-)
+solar_df.to_csv(profile_dir / "solar-p_max_pu.csv", index=False)
 
 # Save hydro-p_max_pu.csv
 hydro_df = pd.DataFrame({
     "time": TIMES.strftime("%Y-%m-%d %H:%M:%S"),
     "p_max_pu": np.round(hydro_profile, 4)  # p.u.
 })
-hydro_csv_header = f"# time [{TIME_ZONE}], p_max_pu [p.u.] (hydro generation profile)\n"
-Path("hybrid_renewable_pypsa/data/profiles/generator_profiles/hydro-p_max_pu.csv").write_text(
-    hydro_csv_header + hydro_df.to_csv(index=False)
-)
+hydro_df.to_csv(profile_dir / "hydro-p_max_pu.csv", index=False)
+
+# Generate metadata file
+generator_metadata = pd.DataFrame([
+    {"profile_name": "solar-p_max_pu.csv", "description": "Solar generation profile with diurnal variation.",
+     "source": "Synthetic model", "time_resolution": "Hourly", "time_zone": TIME_ZONE},
+    {"profile_name": "hydro-p_max_pu.csv", "description": "Hydro generation profile with stable output and minor variations.",
+     "source": "Synthetic model", "time_resolution": "Hourly", "time_zone": TIME_ZONE}
+])
+generator_metadata.to_csv(metadata_path, index=False)
 
 print("Successfully generated:")
-print("- solar-p_max_pu.csv in hybrid_renewable_pypsa/data/profiles/generator_profiles/")
-print("- hydro-p_max_pu.csv in hybrid_renewable_pypsa/data/profiles/generator_profiles/")
+print("- solar-p_max_pu.csv in", profile_dir)
+print("- hydro-p_max_pu.csv in", profile_dir)
+print("- generator_profiles_metadata.csv in", metadata_path)
