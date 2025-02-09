@@ -1,7 +1,7 @@
 import logging
 import os
 
-class Logger_Setup:
+class LoggerSetup:
     @staticmethod
     def setup_logger(name, log_file=None, level=logging.INFO):
         logger = logging.getLogger(name)
