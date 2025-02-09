@@ -1,15 +1,11 @@
-name,bus,carrier,profile_id,p_min,p_max,scaling_factor
-
-
-
-name,bus,profile_id,p_min,p_max,scaling_factor,carrier,voltage_level,load_type,description
-Load_1,Load_AC_415V,residential_1,0.15,0.30,0.9,electricity,415,residential,Residential area 1
-Load_2,Load_AC_415V,residential_2,0.15,0.30,0.9,electricity,415,residential,Residential area 2
-Load_3,Load_AC_415V,commercial_1,0.25,0.50,1.0,electricity,415,commercial,Commercial complex A
-Load_4,Load_AC_415V,industrial_1,0.40,0.80,1.0,electricity,415,industrial,Factory zone 1
-Load_5,Load_AC_415V,industrial_2,0.40,0.80,1.0,electricity,415,industrial,Factory zone 2
-Load_6,Load_AC_415V,commercial_2,0.25,0.50,1.0,electricity,415,commercial,Shopping district
-Load_7,Load_AC_415V,residential_3,0.15,0.30,0.9,electricity,415,residential,Suburban housing
-Load_8,Load_AC_415V,industrial_3,0.40,0.80,1.0,electricity,415,industrial,Processing plant
-Load_9,Load_AC_415V,commercial_3,0.25,0.50,1.0,electricity,415,commercial,Office park
-Load_10,Load_AC_415V,residential_4,0.15,0.30,0.9,electricity,415,residential,Urban apartments
+name,bus,profile_id,p_min,p_max,scaling_factor,load_type,description
+Load_1,Load_AC_415V,residential_1,0.15,0.30,0.9,residential,Residential area 1
+Load_2,Load_AC_415V,residential_2,0.15,0.30,0.9,residential,Residential area 2
+Load_3,Load_AC_415V,commercial_1,0.25,0.50,1.0,commercial,Commercial complex A
+Load_4,Load_AC_415V,industrial_1,0.40,0.80,1.0,industrial,Factory zone 1
+Load_5,Load_AC_415V,industrial_2,0.40,0.80,1.0,industrial,Factory zone 2
+Load_6,Load_AC_415V,commercial_2,0.25,0.50,1.0,commercial,Shopping district
+Load_7,Load_AC_415V,residential_3,0.15,0.30,0.9,residential,Suburban housing
+Load_8,Load_AC_415V,industrial_3,0.40,0.80,1.0,industrial,Processing plant
+Load_9,Load_AC_415V,commercial_3,0.25,0.50,1.0,commercial,Office park
+Load_10,Load_AC_415V,residential_4,0.15,0.30,0.9,residential,Urban apartments
