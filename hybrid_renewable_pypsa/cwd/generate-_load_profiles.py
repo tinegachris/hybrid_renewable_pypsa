@@ -95,7 +95,7 @@ for profile_id, (p_set, q_set) in profiles.items():
     # Add header comment
     csv_header = (f"# time [{TIME_ZONE}], p_set [MW], q_set [MVAR] "
                   f"(power_factor={POWER_FACTOR})\n")
-    Path(f"hybrid_renewable_pypsa/data/load_profiles/{profile_id}.csv").write_text(csv_header + df.to_csv(index=False))
+    Path(f"hybrid_renewable_pypsa/data/profiles/load_profiles/{profile_id}.csv").write_text(csv_header + df.to_csv(index=False))
     
     # Add metadata
     load_type = profile_id.split("_")[0]
@@ -110,8 +110,8 @@ for profile_id, (p_set, q_set) in profiles.items():
     })
 
 # Save metadata file
-pd.DataFrame(metadata_records).to_csv("hybrid_renewable_pypsa/data/load_profiles_metadata.csv", index=False)
+pd.DataFrame(metadata_records).to_csv("hybrid_renewable_pypsa/data/profiles/load_profiles_metadata.csv", index=False)
 
 print("Successfully generated:")
-print(f"- {len(profiles)} load profiles in hybrid_renewable_pypsa/data/load_profiles/")
-print("- Metadata file: hybrid_renewable_pypsa/data/load_profiles_metadata.csv")
+print(f"- {len(profiles)} load profiles in hybrid_renewable_pypsa/data/profiles/load_profiles/")
+print("- Metadata file: hybrid_renewable_pypsa/data/profiles/load_profiles_metadata.csv")

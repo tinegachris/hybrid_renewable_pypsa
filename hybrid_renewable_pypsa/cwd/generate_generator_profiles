@@ -43,7 +43,7 @@ solar_df = pd.DataFrame({
     "p_max_pu": np.round(solar_profile, 4)  # p.u.
 })
 solar_csv_header = f"# time [{TIME_ZONE}], p_max_pu [p.u.] (solar generation profile)\n"
-Path("hybrid_renewable_pypsa/data/generator_profiles/solar-p_max_pu.csv").write_text(
+Path("hybrid_renewable_pypsa/data/profiles/generator_profiles/solar-p_max_pu.csv").write_text(
     solar_csv_header + solar_df.to_csv(index=False)
 )
 
@@ -53,10 +53,10 @@ hydro_df = pd.DataFrame({
     "p_max_pu": np.round(hydro_profile, 4)  # p.u.
 })
 hydro_csv_header = f"# time [{TIME_ZONE}], p_max_pu [p.u.] (hydro generation profile)\n"
-Path("hybrid_renewable_pypsa/data/generator_profiles/hydro-p_max_pu.csv").write_text(
+Path("hybrid_renewable_pypsa/data/profiles/generator_profiles/hydro-p_max_pu.csv").write_text(
     hydro_csv_header + hydro_df.to_csv(index=False)
 )
 
 print("Successfully generated:")
-print("- solar-p_max_pu.csv in hybrid_renewable_pypsa/data/generator_profiles/")
-print("- hydro-p_max_pu.csv in hybrid_renewable_pypsa/data/generator_profiles/")
+print("- solar-p_max_pu.csv in hybrid_renewable_pypsa/data/profiles/generator_profiles/")
+print("- hydro-p_max_pu.csv in hybrid_renewable_pypsa/data/profiles/generator_profiles/")
