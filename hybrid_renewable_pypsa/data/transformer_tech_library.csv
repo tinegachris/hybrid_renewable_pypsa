@@ -1,3 +1,7 @@
+type,f_nom,v_nom_0,v_nom_1,vsc,vscr,pfe,i0,phase_shift,tap_side,tap_neutral,tap_min,tap_max,tap_step,description
+
+
+
 type,typical_impedance_pct,x_r_ratio,cooling_types,insulation_life_years,efficiency_nominal,insulation_material
 oil_cooled,6.0,15,"ONAN,ONAF",30,0.98,mineral_oil
 dry_type,5.5,12,"AN,AF",25,0.97,epoxy_resin

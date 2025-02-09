@@ -1,3 +1,7 @@
+
+
+
+
 type,ramp_limit_up_pct_per_min,ramp_limit_down_pct_per_min,min_up_time_hr,min_down_time_hr,startup_cost_eur,efficiency,fuel_type,co2_emissions_kg_mwh,marginal_cost_eur_mwh
 solar_pv,100,100,0,0,0,1.0,solar,0,0.0
 hydro,30,30,0,0,500,0.85,water,0,20.0

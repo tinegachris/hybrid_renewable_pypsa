@@ -1,3 +1,7 @@
+name,bus0,bus1,type,description
+
+
+
 name,bus0,bus1,type,s_nom,voltage0,voltage1,phases,cooling,vector_group,per_unit_impedance,x_r_ratio,no_load_loss,load_loss,tap_neutral,tap_min,tap_max,tap_step,tap_position,capital_cost,rated_frequency,insulation_type,temperature_rise,manufacturer,installation_year,maintenance_interval,weight,sound_level,description
 Transformer_Load,Main_AC_415V,Load_AC_415V,oil_cooled,1000,415,415,3,ONAN,Dyn11,0.05,15,1500,8000,1,0.9,1.1,0.01,1,1000,50,OilNatural,65,ABB,2015,365,2500,55,415V Distribution transformer
 Transformer_Grid,Grid_IN_AC_33kV,Grid_IN_AC_415V,oil_cooled,4000,33000,415,3,OFAF,YNd11,0.10,20,4500,20000,1,0.9,1.1,0.01,1,2000,50,OilForced,75,Siemens,2020,730,4500,65,33kV/415V Step-down transformer

@@ -1,3 +1,7 @@
+name,bus,carrier,profile_id,p_min,p_max,scaling_factor
+
+
+
 name,bus,profile_id,p_min,p_max,scaling_factor,carrier,voltage_level,load_type,description
 Load_1,Load_AC_415V,residential_1,0.15,0.30,0.9,electricity,415,residential,Residential area 1
 Load_2,Load_AC_415V,residential_2,0.15,0.30,0.9,electricity,415,residential,Residential area 2

@@ -1,3 +1,8 @@
+name,bus0,bus1,type,length,s_nom,capital_cost,carrier,description
+
+
+
+
 name,bus0,bus1,length,s_nom,capital_cost,carrier,type,description
 Line_Grid_to_AC_415V,Grid_IN_AC_415V,Main_AC_415V,1.0,4000,1000,electricity,overhead,Grid to main AC connection
 Line_Hydro_to_AC_415V,Hydro_IN_AC_415V,Main_AC_415V,1.0,1500,1000,electricity,overhead,Hydro to main AC link

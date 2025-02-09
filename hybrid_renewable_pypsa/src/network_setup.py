@@ -12,7 +12,7 @@ class NetworkSetupError(Exception):
         super().__init__(f"{component + ': ' if component else ''}{message}")
         self.component = component
 
-class Network_Setup:
+class NetworkSetup:
     """
     Advanced network configuration manager with:
     - Technology library integration
@@ -185,14 +185,12 @@ class Network_Setup:
         lines = self.data_loader.read_csv('lines.csv')
         line_types = self.data_loader.read_csv('line_types.csv').set_index('name')
 
-        required_columns = ['r_per_length', 'x_per_length', 'c_per_length']
-        line_types = line_types.assign(
-            **{col: line_types.get(col, 0.001) for col in required_columns}
-        )
+        required_columns = ['r_per_length', 'x_per_length', 'c_per_length', 'max_i_ka', 'terrain_factor', 'f_nom', 'mounting', 'cross_section']
+        for col in required_columns:
+            if col not in line_types.columns:
+                line_types[col] = 0.001
 
-        line_types['mounting'] = line_types.get('mounting', 'overhead')
-        line_types['cross_section'] = line_types.get('cross_section', 150)  # mm²
-        line_types['i_nom'] = line_types.get('i_nom', 0.5)  # kA
+        self.logger.info(f"Added {len(line_types)} line types")
 
         if not hasattr(self.network, 'line_types'):
             self.network.line_types = line_types
@@ -520,7 +518,7 @@ def main() -> None:
     """Main execution with performance monitoring"""
     try:
         data_folder = 'hybrid_renewable_pypsa/data'
-        network_setup = Network_Setup(data_folder)
+        network_setup = NetworkSetup(data_folder)
         network = network_setup.setup_network()
 
         logger = Logger_Setup.setup_logger('Main')

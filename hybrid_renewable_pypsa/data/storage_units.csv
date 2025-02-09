@@ -1,3 +1,6 @@
+name,bus,control,type,p_nom,marginal_cost,max_hours,efficiency_store,efficiency_dispatch,description
+
+
 name,bus,type,p_nom,max_hours,efficiency_store,efficiency_dispatch,min_soc,max_soc,cyclic,marginal_cost,description
 StorageUnit_Battery_Storage,BAT_DC_1500V,lithium_ion,5,4.0,0.95,0.93,0.1,0.95,True,0.01,Grid-scale lithium battery storage
 Pumped_Hydro_1,Hydro_AC_33kV,pumped_hydro,10,8.0,0.85,0.88,0.2,0.9,False,0.005,Pumped hydroelectric storage
