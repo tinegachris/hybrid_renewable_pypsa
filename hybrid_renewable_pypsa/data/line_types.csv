@@ -1,10 +1,3 @@
-name, f_nom, r_per_length, x_per_length, c_per_length, i_nom, mounting, cross_section, references
-
-
-
-
-
-
-name,r_per_length,x_per_length,c_per_length,max_i_ka,terrain_factor,f_nom,mounting,cross_section,description
-"overhead",0.05,0.2,9.8e-9,0.5,1.0,50,overhead,150,Standard overhead line (0.05 Ω/km, 0.2 Ω/km, 9.8 nF/km)
-"underground",0.15,0.4,150e-9,0.3,1.2,50,underground,240,Standard underground cable (0.15 Ω/km, 0.4 Ω/km, 150 nF/km)
+name,f_nom,r_per_length,x_per_length,c_per_length,i_nom,mounting,cross_section,references
+overhead,50,0.25,0.15,0.02,200,overhead,150,"Based on typical values for medium-voltage overhead lines"
+underground,50,0.50,0.30,0.08,150,underground,70,"Based on typical values for medium-voltage underground cables"
