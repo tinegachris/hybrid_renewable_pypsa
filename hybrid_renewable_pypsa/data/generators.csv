@@ -1,9 +1,4 @@
 name,bus,control,type,p_nom,p_max_pu,p_min_pu,p_set,q_set,marginal_cost,capital_cost,ramp_limit_up,ramp_limit_down,min_up_time,min_down_time,startup_cost,shutdown_cost,carrier
-
-
-
-
-name,bus,type,p_nom,efficiency,capital_cost,op_cost,p_max_pu,p_min_pu,marginal_cost,control,ramp_limit_up,ramp_limit_down,min_up_time,min_down_time,startup_cost,shutdown_cost,carrier
-Generator_Solar_PV,PV_DC_1000V,solar_pv,1.25,1.0,1000000,10.0,1.0,0.0,0.0,PQ,1.0,1.0,0,0,0,0,solar
-Hydro_Turbine,Hydro_OUT_AC_415V,hydro,1.5,0.85,1500000,20.0,1.0,0.1,0.0,PV,0.5,0.5,4,4,500,200,hydro
-Utility_Grid,Grid_IN_AC_33kV,grid,100.0,1.0,0,50.0,1.0,0.0,50.0,Slack,1.0,1.0,0,0,0,0,AC
+Generator_Solar_PV,PV_DC_1000V,PV,lithium_ion,1250,file:solar-p_max_pu.csv,0.0,0,0,0.01,500000,0.1,0.1,0,0,0,0,Solar
+Generator_Hydro_Turbine,Hydro_OUT_AC_415V,PV,hydro,5000,file:hydro-p_max_pu.csv,0.1,0,0,0.02,800000,0.05,0.05,1,1,100,50,Hydro
+Generator_Utility_Grid,Grid_IN_AC_33kV,Slack,utility,10000,1.0,0.1,0,0,0.03,0,0.2,0.2,0,0,0,0,Grid
