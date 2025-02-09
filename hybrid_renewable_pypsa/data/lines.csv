@@ -1,11 +1,6 @@
 name,bus0,bus1,type,length,s_nom,capital_cost,carrier,description
-
-
-
-
-name,bus0,bus1,length,s_nom,capital_cost,carrier,type,description
-Line_Grid_to_AC_415V,Grid_IN_AC_415V,Main_AC_415V,1.0,4000,1000,electricity,overhead,Grid to main AC connection
-Line_Hydro_to_AC_415V,Hydro_IN_AC_415V,Main_AC_415V,1.0,1500,1000,electricity,overhead,Hydro to main AC link
-Line_Hydro_11kV,Hydro_OUT_AC_11kV,Hydro_IN_AC_11kV,5.0,1500,1200,electricity,underground,Underground hydro 11kV line
-Line_Battery_to_AC_415V,BAT_AC_415V,Main_AC_415V,2.0,2000,500,electricity,overhead,Battery to grid connection
-Line_Solar_to_AC_415V,PV_AC_415V,Main_AC_415V,1.5,3000,600,electricity,overhead,Solar PV to main grid
+Line_Grid_to_AC_415V,Grid_IN_AC_415V,Main_AC_415V,overhead,0.5,10000,100000,AC,Connects utility grid (415V) to main ACDB
+Line_Hydro_to_AC_415V,Hydro_OUT_AC_415V,Main_AC_415V,overhead,1.0,5000,80000,AC,Connects hydro output (415V) to main ACDB
+Line_Hydro_11kV,Hydro_IN_AC_11kV,Hydro_OUT_AC_11kV,underground,2.0,5000,120000,AC,Connects hydro input (11kV) to hydro output (11kV)
+Line_Battery_to_AC_415V,BAT_AC_415V,Main_AC_415V,overhead,0.3,2000,50000,AC,Connects battery (415V) to main ACDB
+Line_Solar_to_AC_415V,PV_AC_415V,Main_AC_415V,overhead,0.2,2000,40000,AC,Connects solar PV (415V) to main ACDB
