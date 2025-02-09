@@ -1,7 +1,2 @@
 name,bus,control,type,p_nom,marginal_cost,max_hours,efficiency_store,efficiency_dispatch,description
-
-
-name,bus,type,p_nom,max_hours,efficiency_store,efficiency_dispatch,min_soc,max_soc,cyclic,marginal_cost,description
-StorageUnit_Battery_Storage,BAT_DC_1500V,lithium_ion,5,4.0,0.95,0.93,0.1,0.95,True,0.01,Grid-scale lithium battery storage
-Pumped_Hydro_1,Hydro_AC_33kV,pumped_hydro,10,8.0,0.85,0.88,0.2,0.9,False,0.005,Pumped hydroelectric storage
-Flywheel_1,Main_AC_415V,flywheel,0.5,0.25,0.98,0.97,0.3,0.7,True,0.02,Frequency regulation flywheel
+StorageUnit_Battery_Storage,BAT_DC_1500V,PQ,lithium_ion,5000,0.05,5,0.95,0.95,Battery energy storage system (5 MWh capacity)
