@@ -1,0 +1,3 @@
+name,sense,value,unit,description
+CO2_emissions,<=,5000,tonne,Maximum system-wide CO₂ emissions allowed.
+Total_Investment,<=,50000000,USD,Cap on total investment cost for new capacity.
