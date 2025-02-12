@@ -3,22 +3,20 @@ import pandas as pd
 import numpy as np
 from typing import Dict, Optional
 from pathlib import Path
-from hybrid_renewable_pypsa.src.data_loader import Data_Loader
-from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
+from hybrid_renewable_pypsa.src.data_loader import DataLoader
+from hybrid_renewable_pypsa.src.logger_setup import LoggerSetup
 
 class NetworkSetupError(Exception):
     """Custom exception for network setup errors with component context"""
     def __init__(self, message: str, component: Optional[str] = None):
-        super().__init__(f"{component + ': ' if component else ''}{message}")
+        super().__init__(f"{(component + ': ') if component else ''}{message}")
         self.component = component
 
 class NetworkSetup:
     """
-    Advanced network configuration manager with:
-    - Technology library integration
-    - Dynamic constraint handling
-    - Hierarchical component validation
-    - Multi-carrier support
+    Network setup class for PyPSA network configuration.
+    This class loads technology libraries, components, constraints, and configures
+    energy carriers and temporal parameters.
     """
 
     CARRIER_CONFIG = {
@@ -27,103 +25,201 @@ class NetworkSetup:
         'electricity': {'color': '#2ca02c', 'co2_emissions': 0.5},
         'hydro': {'color': '#17becf', 'co2_emissions': 0},
         'solar': {'color': '#bcbd22', 'co2_emissions': 0},
-        'DC_AC': {'color': '#9467bd', 'co2_emissions': 0}
-    }
+        }
 
     def __init__(self, data_folder: str) -> None:
         self.data_folder = Path(data_folder)
+        self.data_loader = DataLoader(self.data_folder)
         self.network = pypsa.Network()
+        self._network_components = {}
         self._tech_libraries = {}
-        self.data_loader = Data_Loader(self.data_folder)
-        self.logger = Logger_Setup.setup_logger('NetworkSetup')
+        self._profiles = {}
+        self._constraints = {}
 
-        # Initialize with full temporal structure
+        self.logger = LoggerSetup.setup_logger('NetworkSetup')
+        self.logger.info("Network setup initialized")
+
         self._configure_temporal()
         self._configure_network_properties()
+        self._load_tech_libraries()
+        self._load_components()
+        self._load_profiles()
+        self._load_constraints()
 
     def _configure_temporal(self) -> None:
-        """Configure time parameters with validation"""
+        """Configure time parameters with validation."""
         try:
-            self.network.set_snapshots(
-                pd.date_range("2024-01-01", periods=24*7, freq="h")
-            )
+            snapshots = pd.date_range("2024-01-01", periods=24*7, freq="h")
+            self.network.set_snapshots(snapshots)
             self.network.snapshot_weightings[:] = 1.0
             self.logger.info("Temporal configuration successful")
         except Exception as e:
             raise NetworkSetupError(f"Temporal configuration failed: {str(e)}")
 
     def _configure_network_properties(self) -> None:
-        """Set global network properties"""
+        """Set global network properties."""
         self.network.name = "Hybrid_Renewable_System"
         self.network._meta = {
             "version": "1.3",
-            "data_sources": ["synthetic", "NREL"],
+            "data_sources": ["synthetic"],
             "author": "Chrispine Tinega"
         }
         self.logger.info("Network properties configured")
 
-    def setup_network(self) -> pypsa.Network:
-        """Orchestrate network build process with rollback support"""
+    def _add_carriers(self) -> None:
+        """
+        Add energy carriers to the network based on the CARRIER_CONFIG.
+        Each carrier is added with its specific properties.
+        """
         try:
-            self._load_tech_libraries()
-            self.logger.info("Technology libraries loaded successfully")
-            self._add_carriers()
-            self.logger.info("Energy carriers configured")
-            self._add_components()
-            self.logger.info("Network components added")
-            self._add_constraints()
-            self.logger.info("Network constraints applied")
-            self._validate_network_topology()
-            self.logger.info("Network topology validated")
-            self.logger.info("\n\nNetwork setup complete")
-            return self.network
-
+            for carrier, properties in self.CARRIER_CONFIG.items():
+                self.network.add("Carrier", carrier, **properties)
+            self.logger.info("Carriers added to the network")
         except Exception as e:
-            self.logger.error(f"Network build failed: {str(e)}")
-            self._cleanup_resources()
-            raise
-
-    def get_network(self) -> pypsa.Network:
-        """Retrieve the network object for external use"""
-        return self.network
+            raise NetworkSetupError(f"Error adding carriers: {str(e)}", component="Carriers")
 
     def _load_tech_libraries(self) -> None:
-        """Load technology specifications with version checking"""
-        self._tech_libraries = {
-            'storage': self._validate_tech_library(
-                self.data_loader.load_storage_tech_library(),
-                required_columns=['roundtrip_efficiency', 'cycle_life']
-            ),
-            'transformer': self._validate_tech_library(
-                self.data_loader.load_transformer_tech_library(),
-                required_columns=['typical_impedance_pct', 'cooling_types']
-            ),
-            'generator': self._validate_tech_library(
-                self.data_loader.load_generator_tech_library(),
-                required_columns=['ramp_limit_up_pct_per_min', 'ramp_limit_down_pct_per_min']
-            )
+        """Load component technology specifications with version checking."""
+        tech_files = {
+            'storage': "storage_tech_library.csv",
+            'transformer': "transformer_tech_library.csv",
+            'generator': "generator_tech_library.csv",
+            'line_types': "line_types.csv"
         }
-        self.logger.info("Technology libraries loaded")
+        try:
+            for tech, file in tech_files.items():
+                self._tech_libraries[tech] = self.data_loader.load_tech_library(file).set_index('type')
+                self.logger.info(f"Loaded {len(self._tech_libraries[tech])} {tech} tech specs")
+            self.logger.info("Technology libraries loaded from CSV files")
+        except Exception as e:
+            raise NetworkSetupError(f"Error loading tech libraries: {str(e)}", component="Tech Libraries")
 
-    def _validate_tech_library(self, df: pd.DataFrame, required_columns: list) -> pd.DataFrame:
-        """Ensure technology libraries contain required data"""
-        missing = [col for col in required_columns if col not in df.columns]
-        if missing:
-            raise NetworkSetupError(
-                f"Technology library missing columns: {missing}",
-                component="Tech Libraries"
-            )
-        return df
+    def _load_components(self) -> None:
+        """Load network components from the 'components' folder."""
+        components = ["buses", "transformers", "lines", "generators", "storage_units", "links", "loads"]
+        try:
+            for component in components:
+                self._network_components[component] = self.data_loader.load_component(f"{component}.csv")
+            self.logger.info("Components loaded from CSV files")
+        except Exception as e:
+            raise NetworkSetupError(f"Error loading components: {str(e)}", component="Components")
 
-    def _add_carriers(self) -> None:
-        """Configure energy carriers with emissions tracking"""
-        for name, params in self.CARRIER_CONFIG.items():
-            self.network.add("Carrier", name, **params)
-        self.logger.info(f"Configured {len(self.CARRIER_CONFIG)} energy carriers")
+    def _load_constraints(self) -> None:
+        """Load network constraints from the 'constraints' folder."""
+        contraints = ["global_constraints", "node_constraints", "branch_constraints"]
+        try:
+            for constraint in contraints:
+                self._constraints[constraint] = self.data_loader.load_constraint(f"{constraint}.csv")
+            self.logger.info(f"Loaded {len(self.network.global_constraints)} global constraints")
+        except Exception as e:
+            raise NetworkSetupError(f"Error loading constraints: {str(e)}", component="Constraints")
 
-    def _add_components(self) -> None:
-        """Component addition pipeline with dependency management"""
-        component_order = [
+    def _load_profiles(self) -> None:
+        """Load time-series profiles for loads, generators, grid and storage units."""
+        profile_types = ["load_profiles", "generator_profiles", "storage_profiles", "grid_profiles"]
+        try:
+            for profile_type in profile_types:
+                profile_folder = self.data_folder / "profiles" / profile_type
+                self._profiles[profile_type] = {}
+                for profile_file in profile_folder.glob("*.csv"):
+                    profile_id = profile_file.stem
+                    self._profiles[profile_type][profile_id] = self.data_loader.load_profile(profile_id, profile_type)
+            self.logger.info("Profiles loaded from CSV files")
+        except Exception as e:
+            raise NetworkSetupError(f"Error loading profiles: {str(e)}", component="Profiles")
+
+    def _add_buses(self) -> None:
+        """
+        Add buses to the network with voltage levels and optional coordinates.
+        """
+        try:
+            for _, bus in self._network_components['buses'].iterrows():
+                self.network.add("Bus", **bus.to_dict())
+            self.logger.info(f"Added {len(self._network_components['buses'])} buses")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding buses: {str(e)}", component="Buses")
+
+    def _add_transformers(self) -> None:
+        """
+        Add transformers to the network with impedance and tap ratio specifications.
+        """
+        try:
+            tx_tech_lib = self._tech_libraries['transformer']
+            for _, xfmr in self._network_components['transformers'].iterrows():
+                tech_specs = tx_tech_lib.loc[xfmr['type']]
+                self.network.add("Transformer", **xfmr.to_dict(),**tech_specs.to_dict())
+            self.logger.info(f"Added {len(self._network_components['transformers'])} transformers")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding transformers: {str(e)}", component="Transformers")
+
+    def _add_lines(self) -> None:
+        """
+        Add transmission lines with type-based parameters.
+        """
+        try:
+            line_types = self._tech_libraries['line_types']
+            for _, line in self._network_components['lines'].iterrows():
+                line_specs = line_types.loc[line['type']]
+                self.network.add("Line", **line.to_dict(), **line_specs.to_dict())
+            self.logger.info(f"Added {len(self._network_components['lines'])} lines")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding lines: {str(e)}", component="Lines")
+
+    def _add_generators(self) -> None:
+        """
+        Add generators to the network with capacity, efficiency, and cost specifications.
+        """
+        try:
+            gen_tech_lib = self._tech_libraries['generator']
+            for _, gen in self._network_components['generators'].iterrows():
+                tech_specs = gen_tech_lib.loc[gen['type']]
+                self.network.add("Generator", **{**gen.to_dict(), **tech_specs.to_dict()})
+            self.logger.info(f"Added {len(self._network_components['generators'])} generators")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding generators: {str(e)}", component="Generators")
+
+    def _add_storage_units(self) -> None:
+        """
+        Add storage units to the network with capacity, efficiency, and degradation specifications.
+        """
+        try:
+            storage_tech_lib = self._tech_libraries['storage']
+            for _, storage in self._network_components['storage_units'].iterrows():
+                tech_specs = storage_tech_lib.loc[storage['type']]
+                self.network.add("StorageUnit", **storage.to_dict(), **tech_specs.to_dict())
+            self.logger.info(f"Added {len(self._network_components['storage_units'])} storage units")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding storage units: {str(e)}", component="Storage Units")
+
+    def _add_links(self) -> None:
+        """
+        Add power conversion links to the network with efficiency and cost specifications.
+        """
+        try:
+            for _, link in self._network_components['links'].iterrows():
+                self.network.add("Link", **link.to_dict())
+            self.logger.info(f"Added {len(self._network_components['links'])} links")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding links: {str(e)}", component="Links")
+
+    def _add_loads(self) -> None:
+        """
+        Add loads to the network with power profiles and constraints.
+        """
+        try:
+            for _, load in self._network_components['loads'].iterrows():
+                load_profile = self.data_loader.load_profile(load['profile_id'], profile_type="load_profiles")
+                self.network.add("Load", **load.to_dict())
+            self.logger.info(f"Added {len(self._network_components['loads'])} loads")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding loads: {str(e)}", component="Loads")
+
+    def _add_all_components(self) -> None:
+        """
+        Add network components (buses, lines, generators, loads, storage, transformers, links)
+        from the 'components' folder.
+        """
+        component_adders = [
             self._add_buses,
             self._add_transformers,
             self._add_lines,
@@ -133,401 +229,79 @@ class NetworkSetup:
             self._add_loads
         ]
 
-        for component_adder in component_order:
-            try:
-                component_adder()
-            except Exception as e:
-                raise NetworkSetupError(
-                    f"Component addition failed: {str(e)}",
-                    component=component_adder.__name__[5:]
-                )
-
-    def _add_buses(self) -> None:
-        """Add buses with voltage level validation"""
-        buses = self.data_loader.read_csv('buses.csv')
-        for _, bus in buses.iterrows():
-            self.network.add("Bus",
-                name=bus['name'],
-                v_nom=bus['v_nom'],
-                x=bus.get('x', 0),
-                y=bus.get('y', 0),
-                carrier=bus['carrier'],
-                v_mag_pu_set=bus.get('v_mag_pu_set', 1.0),
-                max_shunt_capacitor=bus.get('max_shunt_capacitor', 0)
-            )
-        self.logger.info(f"Added {len(buses)} buses with voltage validation")
-
-    def _add_transformers(self) -> None:
-        """Add transformers with impedance calculations"""
-        transformers = self.data_loader.read_csv('transformers.csv')
-        tech_lib = self._tech_libraries['transformer']
-
-        for _, xfmr in transformers.iterrows():
-            tech_specs = tech_lib.loc[xfmr['type']]
-            base_impedance = (xfmr['voltage0'] ** 2) / (xfmr['s_nom'] * 1e6)  # MVA base
-
-            self.network.add("Transformer",
-                name=xfmr['name'],
-                bus0=xfmr['bus0'],
-                bus1=xfmr['bus1'],
-                s_nom=xfmr['s_nom'],
-                x=xfmr['per_unit_impedance'] * base_impedance,
-                r=(xfmr['per_unit_impedance'] / xfmr['x_r_ratio']) * base_impedance,
-                tap_ratio=xfmr.get('tap_position', 1.0),
-                phases=xfmr.get('phases', 3),
-                model=xfmr.get('cooling', 'ONAN'),
-                **tech_specs.to_dict()
-            )
-        self.logger.info(f"Added {len(transformers)} transformers with technical specs")
-
-    def _add_lines(self) -> None:
-        """Add transmission lines with type-based parameters"""
-        lines = self.data_loader.read_csv('lines.csv')
-        line_types = self.data_loader.read_csv('line_types.csv').set_index('name')
-
-        required_columns = ['r_per_length', 'x_per_length', 'c_per_length', 'max_i_ka', 'terrain_factor', 'f_nom', 'mounting', 'cross_section']
-        for col in required_columns:
-            if col not in line_types.columns:
-                line_types[col] = 0.001
-
-        self.logger.info(f"Added {len(line_types)} line types")
-
-        if not hasattr(self.network, 'line_types'):
-            self.network.line_types = line_types
-        else:
-            self.network.line_types = pd.concat([self.network.line_types, line_types])
-
-        for _, line in lines.iterrows():
-            line_type = line.get('type', 'overhead')
-            if line_type not in line_types.index:
-                raise NetworkSetupError(
-                    f"Line {line['name']} uses undefined type: {line_type}",
-                    component="Line"
-                )
-
-            type_params = line_types.loc[line_type]
-
-            r = type_params['r_per_length'] * line['length']
-            x = type_params['x_per_length'] * line['length']
-            b = type_params['c_per_length'] * line['length'] * 1e-6  # μS/km to S
-
-            if r == 0 or x == 0:
-                raise NetworkSetupError(
-                    f"Line {line['name']} has zero impedance (r={r}, x={x})",
-                    component="Line"
-                )
-
-            self.network.add("Line",
-                name=line['name'],
-                bus0=line['bus0'],
-                bus1=line['bus1'],
-                r=r,
-                x=x,
-                b=b,
-                s_nom=line['s_nom'],
-                capital_cost=line.get('capital_cost', 0),
-                terrain_factor=type_params.get('terrain_factor', 1.0),
-                max_i_ka=type_params.get('max_i_ka', 1.0),
-                type=line_type
-            )
-
-        self.logger.info(f"Added {len(lines)} lines with type-based parameters")
-
-    def _add_generators(self) -> None:
-        """Add generators with technology-specific parameters"""
-        generators = self.data_loader.read_csv('generators.csv')
-        tech_lib = self._tech_libraries['generator']
-
-        for _, gen in generators.iterrows():
-            tech_specs = tech_lib.loc[gen['type']]
-            self.network.add("Generator",
-                name=gen['name'],
-                bus=gen['bus'],
-                p_nom=gen['p_nom'],
-                efficiency=gen['efficiency'],
-                marginal_cost=gen['marginal_cost'],
-                ramp_limit_up=tech_specs['ramp_limit_up_pct_per_min'],
-                ramp_limit_down=tech_specs['ramp_limit_down_pct_per_min'],
-                min_up_time=tech_specs['min_up_time_hr'],
-                min_down_time=tech_specs['min_down_time_hr'],
-                carrier=gen['carrier'],
-                p_max_pu=gen['p_max_pu'],
-                control=gen.get('control', 'PQ')
-            )
-        self.logger.info(f"Added {len(generators)} generators with tech specs")
-
-    def _add_storage_units(self) -> None:
-        """Add storage systems with degradation modeling"""
-        storage_units = self.data_loader.read_csv('storage_units.csv').fillna({
-            'p_min_pu': 0,
-            'standing_loss': 0,
-            'cyclic': True
-        })
-
-        if storage_units['p_nom'].le(0).any():
-            raise NetworkSetupError("Storage units must have positive p_nom", "StorageUnit")
-
-        tech_lib = self._tech_libraries['storage']
-
-        for _, unit in storage_units.iterrows():
-            tech_specs = tech_lib.loc[unit['type']]
-            self.network.add("StorageUnit",
-                name=unit['name'],
-                bus=unit['bus'],
-                p_nom=unit['p_nom'],
-                max_hours=unit['max_hours'],
-                efficiency_store=unit['efficiency_store'],
-                efficiency_dispatch=unit['efficiency_dispatch'],
-                cyclic_state_of_charge=unit['cyclic'],
-                standing_loss=unit.get('standing_loss', 0),
-                **tech_specs.to_dict()
-            )
-        self.logger.info(f"Added {len(storage_units)} storage units with degradation")
-
-    def _add_links(self) -> None:
-        """Add power conversion links with voltage validation"""
-        links = self.data_loader.read_csv('links.csv')
-        for _, link in links.iterrows():
-            self._validate_link_voltages(link)
-            self.network.add("Link",
-                name=link['name'],
-                bus0=link['bus0'],
-                bus1=link['bus1'],
-                p_nom=link['p_nom'],
-                efficiency=link['efficiency'],
-                capital_cost=link['capital_cost'],
-                carrier=link['carrier'],
-                marginal_cost=link.get('marginal_cost', 0),
-                p_min_pu=link.get('p_min_pu', 0),
-                p_max_pu=link.get('p_max_pu', 1)
-            )
-        self.logger.info(f"Added {len(links)} links with voltage validation")
-
-    def _validate_link_voltages(self, link: pd.Series) -> None:
-        """Verify link voltage compatibility with connected buses"""
-
-        if pd.isna(link['bus0']) or pd.isna(link['bus1']):
-            raise NetworkSetupError("Link has undefined bus connections", "Link")
-
-        bus0_volt = self.network.buses.at[link['bus0'], 'v_nom']
-        bus1_volt = self.network.buses.at[link['bus1'], 'v_nom']
-
-        # Validate DC-AC voltage transformation for inverters
-        if link['type'] == 'inverter':
-            if bus0_volt <= 1500 and bus1_volt not in [415, 800]:
-                raise NetworkSetupError(
-                    f"Inverter {link['name']} has invalid voltage pairing: " +
-                    f"DC {bus0_volt}V to AC {bus1_volt}V",
-                    component="Link"
-                )
-
-    def _add_loads(self) -> None:
-        """Add time-varying loads with profile validation"""
-        loads = self.data_loader.read_csv('loads.csv')
-        for _, load in loads.iterrows():
-            profile = self.data_loader.load_profile(load['profile_id'])
-            self._validate_load_profile(profile, load['name'])
-
-            self.network.add("Load",
-                name=load['name'],
-                bus=load['bus'],
-                p_set=profile['p_set'],
-                q_set=profile['q_set'],
-                p_min=load['p_min'],
-                p_max=load['p_max'],
-                carrier=load['carrier'],
-                load_type=load['load_type']
-            )
-        self.logger.info(f"Added {len(loads)} loads with profile validation")
-
-    def _validate_load_profile(self, profile: pd.DataFrame, load_name: str):
-        """Strict index validation with name check"""
-        if profile.index.name != 'snapshot':
-            raise NetworkSetupError(
-                f"Profile index must be named 'snapshot', got '{profile.index.name}'",
-                component="Load"
-            )
-
-        if not profile.index.equals(self.network.snapshots):
-            raise NetworkSetupError(
-                f"Time index mismatch for load {load_name}",
-                component="Load"
-            )
+        try:
+            for add_component in component_adders:
+                add_component()
+            self.logger.info("All components added to the network successfully")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding components: {str(e)}", component="Components")
 
     def _add_constraints(self) -> None:
-        """Constraint management pipeline"""
-        constraints = {
-            'static': self.data_loader.load_component_constraints(),
-            'dynamic': self.data_loader.load_dynamic_constraints(),
-            'profiles': self.data_loader.load_constraint_profiles()
-        }
-
-        self._apply_static_constraints(constraints['static'])
-        # self._apply_dynamic_constraints(constraints['dynamic'], constraints['profiles'])
-        self.logger.info("Applied all network constraints")
-
-    def _apply_static_constraints(self, constraints: pd.DataFrame) -> None:
-        COMPONENT_MAP = {
-            'Generator': 'generators',
-            'StorageUnit': 'storage_units',
-            'Line': 'lines',
-            'Load': 'loads',
-            'Transformer': 'transformers'
-        }
-
-        for _, constraint in constraints.iterrows():
-            try:
-                component_type = constraint['component_id'].split('_', 1)[0]
-                pypsa_component = COMPONENT_MAP[component_type]
-                component_df = getattr(self.network, pypsa_component)
-
-                # Update directly in the DataFrame using loc
-                for limit_type in ['min', 'max']:
-                    if value := constraint.get(f"{limit_type}_value"):
-                        component_df.loc[constraint['component_id'], f"p_{limit_type}_pu"] = float(value)
-
-            except KeyError:
-                raise NetworkSetupError(f"Invalid component {constraint['component_id']}", component="Constraint")
-
-    def _apply_dynamic_constraints(self, constraints: pd.DataFrame, profiles: Dict) -> None:
-        """Apply constraints with proper PyPSA time-series handling"""
-        COMPONENT_TIME_MAP = {
-            'Generator': ('generators', 'generators_t'),
-            'StorageUnit': ('storage_units', 'storage_units_t'),
-            'Load': ('loads', 'loads_t'),
-            'Line': ('lines', 'lines_t')
-        }
-
-        for _, constraint in constraints.iterrows():
-            component_type = constraint['component_type']
-            component_id = constraint['component_id']
-            constraint_type = constraint['constraint_type']
-            value = profiles.get(constraint['constraint_id'], constraint['value'])
-            time_slice = self._parse_time_window(constraint)
-
-            # Get component handlers
-            static_attr, time_attr = COMPONENT_TIME_MAP[component_type]
-            static_df = getattr(self.network, static_attr)
-
-            try:
-                # Handle time-varying constraints
-                if hasattr(getattr(self.network, time_attr), constraint_type):
-                    time_series = getattr(getattr(self.network, time_attr), constraint_type)
-                    time_series.loc[time_slice, component_id] = value
-                # Handle static constraints
-                elif constraint_type in static_df.columns:
-                    static_df.loc[component_id, constraint_type] = value
-                else:
-                    raise NetworkSetupError(
-                        f"Invalid constraint {constraint_type} for {component_id}",
-                        component=component_type
-                    )
-
-            except KeyError:
-                raise NetworkSetupError(f"Component {component_id} not found", component=component_type)
-
-    def _parse_time_window(self, constraint: pd.Series) -> slice:
-        """Convert to proper datetime slice"""
-        start = pd.to_datetime(constraint['start_time']) if pd.notna(constraint['start_time']) else None
-        end = pd.to_datetime(constraint['end_time']) if pd.notna(constraint['end_time']) else None
-
-        return self.network.snapshots.slice_indexer(
-            start=start,
-            end=end
-        )
+        """
+        Apply loaded constraints to the network.
+        """
+        try:
+            for constraint_type, constraints in self._constraints.items():
+                for _, constraint in constraints.iterrows():
+                    self.network.add("GlobalConstraint", **constraint.to_dict())
+            self.logger.info("Applied all network constraints")
+        except Exception as e:
+            raise NetworkSetupError(f"Error applying constraints: {str(e)}", component="Constraints")
 
     def _validate_network_topology(self) -> None:
-        """Perform comprehensive network validation"""
-        self._check_component_connections()
-        self._check_voltage_levels()
-        self._validate_line_parameters()
-        self._validate_storage_units()
-        self.network.consistency_check()
-        self.logger.info("Network topology validation passed")
+        """
+        Validate the network topology to ensure all components are connected and the system is consistent.
+        This typically runs PyPSA's built-in consistency check.
+        """
+        try:
+            self.network.consistency_check()  # Raises error if inconsistency found
+            self.logger.info("Network topology validated successfully")
+        except Exception as e:
+            raise NetworkSetupError(f"Network topology validation failed: {str(e)}", component="Topology")
 
-    def _check_component_connections(self) -> None:
-        """Verify all components are connected to valid buses"""
-        component_map = {
-            # (Component Type, PyPSA DataFrame Name, Bus Columns)
-            'Generator': ('generators', ['bus']),
-            'Load': ('loads', ['bus']),
-            'StorageUnit': ('storage_units', ['bus']),
-            'Link': ('links', ['bus0', 'bus1'])
-        }
-
-        for comp_type, (df_name, bus_cols) in component_map.items():
-            try:
-                df = getattr(self.network, df_name)
-                for name, comp in df.iterrows():
-                    for bus_col in bus_cols:
-                        bus = comp[bus_col]
-                        if bus not in self.network.buses.index:
-                            raise NetworkSetupError(
-                                f"{comp_type} {name} connects to invalid bus {bus_col}={bus}",
-                                component=comp_type
-                            )
-            except AttributeError:
-                raise NetworkSetupError(
-                    f"PyPSA network missing {df_name} DataFrame",
-                    component=comp_type
-                )
-
-    def _check_voltage_levels(self) -> None:
-        """Validate voltage compatibility across connections"""
-        for _, line in self.network.lines.iterrows():
-            if pd.isna(line['bus0']) or pd.isna(line['bus1']):
-                raise NetworkSetupError(
-                    f"Line {line.name} has NaN bus values: bus0={line.bus0}, bus1={line.bus1}",
-                    component="Line"
-                )
-            bus0_v = self.network.buses.at[line.bus0, 'v_nom']
-            bus1_v = self.network.buses.at[line.bus1, 'v_nom']
-
-            if abs(bus0_v - bus1_v) > 1e-3:
-                raise NetworkSetupError(
-                    f"Line {line.name} connects different voltage levels: " +
-                    f"{bus0_v}V - {bus1_v}V",
-                    component="Line"
-                )
-
-    def _validate_line_parameters(self):
-        """Ensure line parameters are physically realistic"""
-        lines = self.network.lines
-        invalid = lines[(lines.r <= 0) | (lines.x <= 0)]
-        if not invalid.empty:
-            raise NetworkSetupError(
-                f"Lines with invalid impedance: {invalid.index.tolist()}",
-                component="Line"
-            )
-
-    def _validate_storage_units(self):
-        """Validate storage unit parameters"""
-        for name, su in self.network.storage_units.iterrows():
-            if su.max_hours <= 0:
-                raise NetworkSetupError(
-                    f"Storage {name} has invalid max_hours {su.max_hours}",
-                    component="StorageUnit"
-                )
+    def get_network(self) -> pypsa.Network:
+        """Retrieve the network object for external use."""
+        return self.network
 
     def _cleanup_resources(self) -> None:
-        """Release resources after failed build"""
+        """
+        Cleanup temporary resources or perform any rollback actions in case of errors during network setup.
+        """
+        self.logger.info("Cleaning up temporary resources...")
         self.network = None
         self._tech_libraries.clear()
+        self._network_components.clear()
+        self._profiles.clear()
+        self._constraints.clear()
+
+    def setup_network(self) -> pypsa.Network:
+        """Orchestrate network build process with rollback support."""
+        try:
+            self._add_all_components()
+            self._add_constraints()
+            self._validate_network_topology()
+            self.logger.info("\n\nNetwork setup complete\n")
+            return self.network
+
+        except Exception as e:
+            self.logger.error(f"Network build failed: {str(e)}")
+            self._cleanup_resources()
+            raise
 
 def main() -> None:
-    """Main execution with performance monitoring"""
+    """Main execution with performance monitoring."""
     try:
         data_folder = 'hybrid_renewable_pypsa/data'
         network_setup = NetworkSetup(data_folder)
         network = network_setup.setup_network()
 
-        logger = Logger_Setup.setup_logger('Main')
-        logger.info("\n\nNetwork Statistics:")
-        logger.info(f"- Buses: {len(network.buses)}")
-        logger.info(f"- Lines: {len(network.lines)}")
-        logger.info(f"- Generators: {len(network.generators)}")
-        logger.info(f"- Storage Units: {len(network.storage_units)}")
-        logger.info(f"- Active Constraints: {len(network.global_constraints)}")
+        print("Buses:\n", network.buses)
+        print("Lines:\n", network.lines)
+        print("Generators:\n", network.generators)
+        print("Storage Units:\n", network.storage_units)
+        print("Links:\n", network.links)
+        print("Loads:\n", network.loads)
+        print("Global Constraints:\n", network.global_constraints)
 
     except NetworkSetupError as e:
         print(f"Network Configuration Error: {str(e)}")
