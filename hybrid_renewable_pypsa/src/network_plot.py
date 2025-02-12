@@ -3,21 +3,21 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from typing import Optional, Dict, Any
 from matplotlib.axes import Axes
-from hybrid_renewable_pypsa.src.data_loader import Data_Loader
-from hybrid_renewable_pypsa.src.network_setup import Network_Setup
-from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
+from hybrid_renewable_pypsa.src.data_loader import DataLoader
+from hybrid_renewable_pypsa.src.network_setup import NetworkSetup
+from hybrid_renewable_pypsa.src.logger_setup import LoggerSetup
 
 class NetworkPlotError(Exception):
     """Custom exception for network plotting errors."""
     pass
 
-class Network_Plot:
+class NetworkPlot:
     def __init__(self, data_folder: str) -> None:
-        self.data_loader = Data_Loader(data_folder)
-        self.network_setup = Network_Setup(data_folder)
+        self.data_loader = DataLoader(data_folder)
+        self.network_setup = NetworkSetup(data_folder)
         self.network_setup.setup_network()
         self.network = self.network_setup.get_network()
-        self.logger = Logger_Setup.setup_logger('NetworkPlot')
+        self.logger = LoggerSetup.setup_logger('NetworkPlot')
         self.plot_config = self._load_plot_config()
 
     def _load_plot_config(self) -> Dict[str, Any]:
@@ -170,5 +170,5 @@ class Network_Plot:
 
 if __name__ == '__main__':
     data_folder = 'hybrid_renewable_pypsa/data'
-    network_plotter = Network_Plot(data_folder)
+    network_plotter = NetworkPlot(data_folder)
     network_plotter.main()

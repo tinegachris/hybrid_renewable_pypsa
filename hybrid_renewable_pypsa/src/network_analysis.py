@@ -1,6 +1,6 @@
-from hybrid_renewable_pypsa.src.network_setup import Network_Setup
-from hybrid_renewable_pypsa.src.data_loader import Data_Loader
-from hybrid_renewable_pypsa.src.logger_setup import Logger_Setup
+from hybrid_renewable_pypsa.src.network_setup import NetworkSetup
+from hybrid_renewable_pypsa.src.data_loader import DataLoader
+from hybrid_renewable_pypsa.src.logger_setup import LoggerSetup
 from typing import Dict, Any
 import pandas as pd
 
@@ -8,20 +8,20 @@ class NetworkAnalysisError(Exception):
     """Custom exception for network analysis errors."""
     pass
 
-class Network_Analysis:
+class NetworkAnalysis:
     """
     Network_Analysis class for analyzing a PyPSA network.
     Attributes:
-        network_setup (Network_Setup): Instance of the Network_Setup class.
+        network_setup (NetworkSetup): Instance of the NetworkSetup class.
         network (pypsa.Network): The PyPSA network to analyze.
         logger (Logger): Logger instance for logging analysis progress.
     """
     def __init__(self, data_folder: str) -> None:
-        self.data_loader = Data_Loader(data_folder)
-        self.network_setup = Network_Setup(data_folder)
+        self.data_loader = DataLoader(data_folder)
+        self.network_setup = NetworkSetup(data_folder)
         self.network_setup.setup_network()
         self.network = self.network_setup.get_network()
-        self.logger = Logger_Setup.setup_logger('NetworkAnalysis')
+        self.logger = LoggerSetup.setup_logger('NetworkAnalysis')
 
     def analyze_network(self) -> Dict[str, Any]:
         """Run all analysis methods and return a summary of results."""
@@ -133,6 +133,6 @@ class Network_Analysis:
 
 if __name__ == '__main__':
     data_folder = 'hybrid_renewable_pypsa/data'
-    network_analysis = Network_Analysis(data_folder)
+    network_analysis = NetworkAnalysis(data_folder)
     results = network_analysis.analyze_network()
     print(results)
