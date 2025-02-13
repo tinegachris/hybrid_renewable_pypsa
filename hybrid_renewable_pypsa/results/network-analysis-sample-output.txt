@@ -1,0 +1,29 @@
+{
+    "consistency_check": True,
+    "power_flow": {
+        "bus_voltages": pd.DataFrame(...),
+        "line_flows": pd.DataFrame(...),
+        "generator_dispatch": pd.DataFrame(...),
+    },
+    "optimal_power_flow": {
+        "generator_dispatch": pd.DataFrame(...),
+        "storage_dispatch": pd.DataFrame(...),
+        "marginal_costs": pd.DataFrame(...),
+    },
+    "storage_analysis": {
+        "storage_dispatch": pd.DataFrame(...),
+        "state_of_charge": pd.DataFrame(...),
+    },
+    "reliability_analysis": {
+        "unmet_demand": 123.45,
+    },
+    "load_shift_analysis": {
+        "load_shift_potential": 678.90,
+    },
+    "losses_analysis": {
+        "line_losses": 12.34,
+        "bus_losses": 5.67,
+        "transformer_losses": 8.90,
+        "total_losses": 26.91,
+    }
+}

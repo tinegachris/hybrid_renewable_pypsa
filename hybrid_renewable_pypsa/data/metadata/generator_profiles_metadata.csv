@@ -1,0 +1,3 @@
+profile_name,description,source,time_resolution,time_zone
+solar-p_max_pu.csv,Solar generation profile with diurnal variation.,Synthetic model,Hourly,UTC+00
+hydro-p_max_pu.csv,Hydro generation profile with stable output and minor variations.,Synthetic model,Hourly,UTC+00

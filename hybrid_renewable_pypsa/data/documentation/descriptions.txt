@@ -1,0 +1,227 @@
+### Network Components
+
+#### buses.csv
+| Column                | Description                                                                 | Units       | Example       |
+|-----------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name                  | Unique bus identifier                                                       | -           | Main_AC_415V  |
+| v_nom                 | Nominal voltage                                                             | V           | 415           |
+| x                     | X-coordinate (geographical or schematic)                                    | -           | 0.0           |
+| y                     | Y-coordinate (geographical or schematic)                                    | -           | 6.0           |
+| carrier               | Energy carrier type (AC/DC)                                                 | -           | AC            |
+| v_mag_pu_set          | Voltage magnitude setpoint                                                  | p.u.        | 1.0           |
+| v_mag_pu_min          | Minimum allowed voltage                                                     | p.u.        | 0.95          |
+| v_mag_pu_max          | Maximum allowed voltage                                                     | p.u.        | 1.05          |
+| control               | Control mode (PQ, PV, Slack)                                                | -           | PV            |
+| zone                  | Geographical zone identifier                                                | -           | A             |
+| max_shunt_capacitor   | Maximum shunt compensation capacity                                         | MVAr        | 0.2           |
+
+#### links.csv (Converters/Inverters)
+| Column          | Description                                                                 | Units       | Example       |
+|-----------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name            | Unique converter identifier                                                 | -           | Battery_Inverter |
+| bus0            | DC-side connection bus                                                      | -           | BAT_DC_1500V  |
+| bus1            | AC-side connection bus                                                      | -           | BAT_AC_800V   |
+| p_nom           | Nominal power capacity                                                      | MW          | 4.0           |
+| efficiency      | Power conversion efficiency                                                 | p.u.        | 0.96          |
+| carrier         | Energy carrier type                                                         | -           | DC_AC         |
+| type            | Converter technology type                                                   | -           | inverter      |
+
+#### dynamic_constraints.csv
+| Column            | Description                                                                 | Units       | Example       |
+|--------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| constraint_id      | Unique constraint identifier                                                | -           | ramp_gen1     |
+| component_type     | Component category (Generator/StorageUnit/Load)                             | -           | Generator     |
+| component_id       | Targeted component name                                                     | -           | Generator_1   |
+| constraint_type    | Constraint category                                                         | -           | ramp_limit_up |
+| value              | Constraint value                                                            | varies      | 0.2           |
+| start_time         | Activation start time (hh:mm)                                               | -           | 08:00         |
+| end_time           | Activation end time (hh:mm)                                                 | -           | 20:00         |
+
+#### component_constraints.csv
+| Column            | Description                                                                 | Units       | Example       |
+|--------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| component_id       | Constrained component name                                                  | -           | Line_1        |
+| constraint_type    | Physical limit type                                                         | -           | max_loading   |
+| min_value          | Minimum allowed value                                                       | varies      | 0.0           |
+| max_value          | Maximum allowed value                                                       | varies      | 0.95          |
+| unit               | Measurement unit                                                            | -           | per_unit      |
+
+#### constraint_profiles.csv
+| Column            | Description                                                                 | Units       | Example               |
+|--------------------|-----------------------------------------------------------------------------|-------------|-----------------------|
+| constraint_id      | Linked constraint identifier                                                | -           | transformer_temp      |
+| component_id       | Affected component                                                          | -           | Transformer_Grid      |
+| time_index         | Timestamp of constraint activation                                          | datetime    | 2024-01-01 12:00:00  |
+| value              | Constraint value at specified time                                          | varies      | 0.9                  |
+
+---
+
+### Technology Libraries
+
+#### storage_tech_library.csv
+| Column                   | Description                                                                 | Units       | Example       |
+|--------------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| type                     | Storage technology type                                                     | -           | lithium_ion   |
+| roundtrip_efficiency     | Energy efficiency for charge/discycle                                       | p.u.        | 0.85          |
+| cycle_life               | Full charge-discharge cycles before EOL                                     | cycles      | 5000          |
+| degradation_per_cycle    | Capacity loss per cycle                                                     | %/cycle     | 0.002         |
+| self_discharge           | Daily self-discharge rate                                                   | %/day       | 0.5           |
+| standing_loss            | Hourly idle losses                                                          | %/hour      | 0.1           |
+
+#### transformer_tech_library.csv
+| Column                | Description                                                                 | Units       | Example       |
+|-----------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| type                  | Transformer construction type                                               | -           | oil_cooled    |
+| typical_impedance     | Short-circuit impedance                                                     | %           | 6.0           |
+| x_r_ratio             | Reactance/Resistance ratio                                                  | -           | 15            |
+| cooling_types         | Supported cooling methods                                                   | -           | ONAN,ONAF     |
+| insulation_life       | Expected lifespan of insulation                                             | years       | 30            |
+
+#### generator_tech_library.csv
+| Column                | Description                                                                 | Units       | Example       |
+|-----------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| type                  | Generator technology type                                                   | -           | gas_turbine   |
+| ramp_limit_up         | Maximum upward power ramp rate                                              | %/min       | 30            |
+| ramp_limit_down       | Maximum downward power ramp rate                                            | %/min       | 30            |
+| min_up_time           | Minimum operational duration after start                                    | hours       | 2             |
+| min_down_time         | Minimum offline duration after shutdown                                     | hours       | 2             |
+| startup_cost          | Activation cost                                                             | $           | 500           |
+
+---
+
+### Load Profiles
+#### commercial_*.csv / industrial_*.csv
+| Column      | Description                                                                 | Units       | Example               |
+|-------------|-----------------------------------------------------------------------------|-------------|-----------------------|
+| time        | Timestamp (UTC)                                                             | datetime    | 2024-01-01 00:00:00  |
+| p_set       | Active power demand                                                         | MW          | 0.3078               |
+| q_set       | Reactive power demand                                                       | MVAr        | 0.1484               |
+
+#### load_profiles_metadata.csv
+| Column          | Description                                                                 | Example               |
+|-----------------|-----------------------------------------------------------------------------|-----------------------|
+| profile_id      | Matches load profile filename                                               | commercial_1         |
+| load_type       | Consumer category (residential/commercial/industrial)                      | commercial           |
+| voltage_kV      | Connection voltage                                                          | 0.415                |
+| time_zone       | Timezone reference                                                          | UTC+00               |
+| power_factor    | Assumed power factor                                                        | 0.9                  |
+| data_source     | Profile origin (synthetic/measured)                                         | synthetic            |
+
+---
+
+### Optimization Parameters
+#### global_constraints.csv
+| Column            | Description                                                                 | Example       |
+|--------------------|-----------------------------------------------------------------------------|---------------|
+| name              | Constraint name                                                             | co2_limit     |
+| type              | Constraint type (primary_energy/co2_budget)                                 | co2_budget    |
+| carrier_attribute | Affected energy carrier                                                     | coal          |
+| sense             | Inequality direction (<=/==/>=)                                             | <=            |
+| constant          | Constraint value                                                            | 100000        |
+
+### generators.csv
+| Column            | Description                                                                 | Units       | Example       |
+|--------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name              | Unique identifier for the generator                                         | -           | Solar_PV      |
+| bus               | Connection bus (AC or DC)                                                   | -           | PV_DC_1000V   |
+| type              | Technology type                                                             | -           | solar_pv      |
+| p_nom             | Nominal active power capacity                                               | MW          | 1250          |
+| efficiency        | Conversion efficiency (output/input)                                        | p.u.        | 0.85          |
+| capital_cost      | Capital cost per MW                                                         | $/MW        | 1500          |
+| op_cost           | Operational cost per MWh                                                    | $/MWh       | 0.02          |
+| p_max_pu          | Maximum output as fraction of p_nom                                         | p.u.        | 1.0           |
+| p_min_pu          | Minimum stable output fraction                                              | p.u.        | 0.1           |
+| marginal_cost     | Cost for optimization priority                                              | $/MWh       | 0.0           |
+| control           | Control mode (PQ, PV, Slack)                                                | -           | PQ            |
+| ramp_limit_up     | Maximum upward ramp rate                                                    | p.u./hour   | 0.5           |
+| ramp_limit_down   | Maximum downward ramp rate                                                  | p.u./hour   | 0.5           |
+| min_up_time       | Minimum operational hours after start                                       | hours       | 4             |
+| min_down_time     | Minimum offline hours after stop                                            | hours       | 4             |
+| startup_cost      | Cost for activating generator                                               | $           | 500           |
+| shutdown_cost     | Cost for deactivating generator                                             | $           | 200           |
+| carrier           | Energy carrier type                                                         | -           | hydro         |
+
+### lines.csv
+| Column            | Description                                                                 | Units       | Example       |
+|--------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name              | Unique line identifier                                                     | -           | Line_Grid     |
+| bus0              | Starting bus                                                               | -           | Grid_IN_415V  |
+| bus1              | Ending bus                                                                 | -           | Main_AC_415V  |
+| length            | Line length                                                                | km          | 1.0           |
+| r_per_length      | Resistance per km                                                          | Ω/km        | 0.05          |
+| x_per_length      | Reactance per km                                                           | Ω/km        | 0.2           |
+| c_per_length      | Capacitance per km                                                         | nF/km       | 0.01          |
+| s_nom             | Apparent power capacity                                                    | MVA         | 4000          |
+| capital_cost      | Installation cost per km                                                   | $/km        | 1000          |
+| carrier           | Energy carrier type                                                        | -           | electricity   |
+| type              | Construction type                                                          | -           | overhead      |
+| max_i_ka          | Maximum current capacity                                                   | kA          | 0.5           |
+| terrain_factor    | Difficulty multiplier for installation                                     | p.u.        | 1.2           |
+| temperature       | Design operating temperature                                               | °C          | 25            |
+| voltage_level     | Nominal voltage rating                                                     | V           | 415           |
+
+### loads.csv
+| Column           | Description                                                                 | Units       | Example       |
+|-------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name             | Unique load identifier                                                      | -           | Load_1        |
+| bus              | Connection bus                                                              | -           | Load_AC_415V  |
+| profile_id       | Associated load profile                                                     | -           | residential_1 |
+| p_min            | Minimum active power demand                                                | MW          | 0.15          |
+| p_max            | Maximum active power demand                                                | MW          | 0.3           |
+| scaling_factor   | Time-series scaling factor                                                 | p.u.        | 0.9           |
+| carrier          | Energy carrier type                                                        | -           | electricity   |
+| voltage_level    | Nominal voltage                                                             | V           | 415           |
+| load_type        | Consumer category                                                          | -           | residential   |
+| description      | Human-readable description                                                | -           | Urban apartments |
+
+### storage_units.csv
+| Column                   | Description                                                                 | Units       | Example       |
+|--------------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name                     | Unique storage identifier                                                   | -           | Battery_Storage |
+| bus                      | Connection bus                                                              | -           | BAT_DC_1500V  |
+| type                     | Storage technology                                                          | -           | lithium_ion   |
+| p_nom                    | Power capacity                                                              | MW          | 5             |
+| max_hours                | Energy capacity at max power                                                | hours       | 4             |
+| efficiency_store         | Charging efficiency                                                         | p.u.        | 0.95          |
+| efficiency_dispatch      | Discharging efficiency                                                      | p.u.        | 0.93          |
+| self_discharge           | Daily self-discharge rate                                                   | %/day       | 0.5           |
+| standing_loss            | Hourly idle losses                                                          | %/hour      | 0.1           |
+| cycle_life               | Full cycle lifespan                                                         | cycles      | 5000          |
+| degradation_per_cycle    | Capacity loss per cycle                                                     | %/cycle     | 0.002         |
+| capital_cost_power       | Power conversion system cost                                                | $/kW        | 300           |
+| capital_cost_energy      | Energy storage cost                                                         | $/kWh       | 200           |
+| marginal_cost            | Optimization priority cost                                                  | $/MWh       | 0.01          |
+| min_soc                  | Minimum state of charge                                                     | p.u.        | 0.1           |
+| max_soc                  | Maximum state of charge                                                     | p.u.        | 0.95          |
+
+### transformers.csv
+| Column                | Description                                                                 | Units       | Example       |
+|-----------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name                  | Unique transformer identifier                                              | -           | Transformer_Grid |
+| bus0                  | Primary side bus                                                           | -           | Grid_IN_33kV  |
+| bus1                  | Secondary side bus                                                         | -           | Grid_IN_415V  |
+| type                  | Construction type                                                          | -           | oil_cooled    |
+| s_nom                 | Nominal apparent power                                                     | MVA         | 4             |
+| voltage0              | Primary voltage                                                            | V           | 33000         |
+| voltage1              | Secondary voltage                                                          | V           | 415           |
+| phases                | Number of phases                                                           | -           | 3             |
+| cooling               | Cooling method                                                             | -           | OFAF          |
+| vector_group          | Winding configuration                                                      | -           | YNd11         |
+| per_unit_impedance    | Short-circuit impedance                                                    | p.u.        | 0.1           |
+| x_r_ratio             | Reactance/Resistance ratio                                                 | -           | 20            |
+| no_load_loss          | No-load power loss                                                         | kW          | 4.5           |
+| load_loss             | Full-load power loss                                                       | kW          | 20            |
+| insulation_type       | Insulation material                                                        | -           | OilForced     |
+| temperature_rise      | Maximum winding temperature rise                                           | °C          | 75            |
+
+### buses.csv
+| Column                | Description                                                                 | Units       | Example       |
+|-----------------------|-----------------------------------------------------------------------------|-------------|---------------|
+| name                  | Unique bus identifier                                                       | -           | Main_AC_415V  |
+| v_nom                 | Nominal voltage                                                             | V           | 415           |
+| x                     | X-coordinate for visualization                                             | -           | 0.0           |
+| y                     | Y-coordinate for visualization                                             | -           | 0.0           |
+| carrier               | Energy carrier type                                                        | -           | AC            |
+| control               | Bus control type (PQ, PV, Slack)                                           | -           | PV            |
+| marginal_cost         | Cost for voltage regulation                                                | $/V         | 0.005         |
+| max_shunt_capacitor   | Maximum shunt capacitor capacity                                           | MVAr        | 0.2           |

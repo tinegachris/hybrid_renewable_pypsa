@@ -1,0 +1,3 @@
+name,bus0,bus1,efficiency,p_nom,p_min_pu,p_max_pu,marginal_cost,description
+Link_Battery_Inverter,BAT_DC_1500V,BAT_AC_800V,0.97,2000,-1,1,0.01,Inverter connecting battery DC bus to AC bus (800V)
+Link_PV_Inverter,PV_DC_1000V,PV_AC_415V,0.98,2500,-1,1,0.005,Inverter connecting solar PV DC bus to AC bus (415V)

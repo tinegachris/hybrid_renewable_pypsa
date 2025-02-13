@@ -1,0 +1,6 @@
+name,bus0,bus1,type,description
+Transformer_Load,Main_AC_415V,Load_AC_415V,Transformer_Load,Transformer between main AC bus and load bus
+Transformer_Grid,Grid_IN_AC_33kV,Grid_IN_AC_415V,Transformer_Grid,Step-down transformer connecting grid to AC bus
+Transformer_Hydro_Step_Up,Hydro_OUT_AC_415V,Hydro_OUT_AC_11kV,Transformer_Hydro_Step_Up,Step-up transformer for hydro generator output
+Transformer_Hydro_Step_Down,Hydro_IN_AC_11kV,Hydro_IN_AC_415V,Transformer_Hydro_Step_Down,Step-down transformer for hydro input
+Transformer_Battery,BAT_AC_800V,BAT_AC_415V,Transformer_Battery,Transformer for battery inverters stepping down to AC bus voltage

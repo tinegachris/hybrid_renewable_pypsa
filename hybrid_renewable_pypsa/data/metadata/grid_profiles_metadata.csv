@@ -1,0 +1,2 @@
+profile_name,description,source,time_resolution,time_zone
+grid_import_p_max_pu.csv,Grid import profile with daily demand variations.,Synthetic model,Hourly,UTC+00

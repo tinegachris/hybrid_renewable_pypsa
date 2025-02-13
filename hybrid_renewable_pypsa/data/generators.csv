@@ -1,4 +1,0 @@
-name,bus,control,p_nom,efficiency,capital_cost,op_cost,p_max_pu,p_min_pu,marginal_cost
-Solar_PV,PV_DC_1000V,PQ,1250,0.18,1000,0.01,1.0,0.0,0
-Hydro_Turbine,Hydro_OUT_AC_415V,PQ,1500,0.85,1500,0.02,1.0,0.1,0
-Utility_Grid,Grid_IN_AC_33kV,Slack,10000,1.0,0,0.03,1.0,0.0,0.05
