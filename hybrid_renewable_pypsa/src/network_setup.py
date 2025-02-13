@@ -23,8 +23,9 @@ class NetworkSetup:
         'AC': {'color': '#1f77b4', 'co2_emissions': 0},
         'DC': {'color': '#ff7f0e', 'co2_emissions': 0},
         'electricity': {'color': '#2ca02c', 'co2_emissions': 0.5},
-        'hydro': {'color': '#17becf', 'co2_emissions': 0},
-        'solar': {'color': '#bcbd22', 'co2_emissions': 0},
+        'Hydro': {'color': '#17becf', 'co2_emissions': 0},
+        'Solar': {'color': '#bcbd22', 'co2_emissions': 0},
+        'Grid': {'color': '#d62728', 'co2_emissions': 0.5},
     }
 
     def __init__(self, data_folder: str) -> None:
@@ -147,7 +148,6 @@ class NetworkSetup:
                 if xfmr['type'] not in tx_tech_lib.index:
                     raise NetworkSetupError(f"Transformer type {xfmr['type']} not found in tech library", component="Transformer")
                 tech_specs = tx_tech_lib.loc[xfmr['type']]
-                # Merge CSV data with technology specs. You may include additional calculations if needed.
                 transformer_data = {**xfmr.to_dict(), **tech_specs.to_dict()}
                 self.network.add("Transformer", **transformer_data)
             self.logger.info(f"Added {len(self._network_components['transformers'])} transformers")
@@ -178,6 +178,7 @@ class NetworkSetup:
         """Add generators with capacity, efficiency, and cost specifications."""
         try:
             gen_tech_lib = self._tech_libraries['generator']
+            self.network.generator_types = gen_tech_lib.copy()
             for _, gen in self._network_components['generators'].iterrows():
                 if gen['type'] not in gen_tech_lib.index:
                     raise NetworkSetupError(f"Generator type {gen['type']} not found in tech library", component="Generator")
@@ -192,6 +193,7 @@ class NetworkSetup:
         """Add storage units with capacity, efficiency, and degradation specifications."""
         try:
             storage_tech_lib = self._tech_libraries['storage']
+            self.network.storage_units_types = storage_tech_lib.copy()
             for _, storage in self._network_components['storage_units'].iterrows():
                 if storage['type'] not in storage_tech_lib.index:
                     raise NetworkSetupError(f"Storage type {storage['type']} not found in tech library", component="StorageUnit")
@@ -215,7 +217,6 @@ class NetworkSetup:
         """Add loads to the network with power profiles and constraints."""
         try:
             for _, load in self._network_components['loads'].iterrows():
-                # Load profile for each load is loaded separately. Here we assume the load CSV includes a 'profile_id'
                 load_profile = self.data_loader.load_profile(load['profile_id'], profile_type="load_profiles")
                 self.network.add("Load", **load.to_dict())
             self.logger.info(f"Added {len(self._network_components['loads'])} loads")
@@ -240,17 +241,44 @@ class NetworkSetup:
         except Exception as e:
             raise NetworkSetupError(f"Error adding components: {str(e)}", component="Components")
 
-    def _add_constraints(self) -> None:
+
+    def _add_global_constraints(self) -> None:
+        """Add global constraints to the network."""
+        try:
+            for _, constraint in self._constraints['global_constraints'].iterrows():
+                self.network.add("GlobalConstraint", **constraint.to_dict())
+            self.logger.info(f"Added {len(self._constraints['global_constraints'])} global constraints")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding global constraints: {str(e)}", component="Global Constraints")
+
+    def _add_node_constraints(self) -> None:
+        """Add node constraints to the network."""
+        try:
+            for _, constraint in self._constraints['node_constraints'].iterrows():
+                self.network.add("NodeConstraint", **constraint.to_dict())
+            self.logger.info(f"Added {len(self._constraints['node_constraints'])} node constraints")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding node constraints: {str(e)}", component="Node Constraints")
+
+    def _add_branch_constraints(self) -> None:
+        """Add branch constraints to the network."""
+        try:
+            for _, constraint in self._constraints['branch_constraints'].iterrows():
+                self.network.add("BranchConstraint", **constraint.to_dict())
+            self.logger.info(f"Added {len(self._constraints['branch_constraints'])} branch constraints")
+        except Exception as e:
+            raise NetworkSetupError(f"Error adding branch constraints: {str(e)}", component="Branch Constraints")
+
+    def _add_all_constraints(self) -> None:
         """Apply loaded constraints to the network."""
         try:
-            # Iterate over each constraint file (global, node, branch, etc.)
-            for constraint_type, constraints in self._constraints.items():
-                for idx, constraint in constraints.iterrows():
-                    constraint_dict = constraint.to_dict()
-                    # Ensure a 'name' is provided; if missing, generate a default name
-                    if "name" not in constraint_dict or pd.isna(constraint_dict["name"]):
-                        constraint_dict["name"] = f"{constraint_type}_{idx}"
-                    self.network.add("GlobalConstraint", **constraint_dict, overwrite=True)
+            constraint_adders = [
+                self._add_global_constraints,
+                # self._add_node_constraints,
+                # self._add_branch_constraints
+            ]
+            for add_constraint in constraint_adders:
+                add_constraint()
             self.logger.info("Applied all network constraints")
         except Exception as e:
             raise NetworkSetupError(f"Error applying constraints: {str(e)}", component="Constraints")
@@ -260,7 +288,7 @@ class NetworkSetup:
         Validate network topology to ensure all components are connected and the system is consistent.
         """
         try:
-            self.network.consistency_check()  # Raises error if inconsistencies are found
+            self.network.consistency_check()
             self.logger.info("Network topology validated successfully")
         except Exception as e:
             raise NetworkSetupError(f"Network topology validation failed: {str(e)}", component="Topology")
@@ -273,12 +301,14 @@ class NetworkSetup:
         self._network_components.clear()
         self._profiles.clear()
         self._constraints.clear()
+        self.logger.info("Temporary resources cleaned up")
 
     def setup_network(self) -> pypsa.Network:
         """Orchestrate the network build process with rollback support."""
         try:
+            self._add_carriers()
             self._add_all_components()
-            self._add_constraints()
+            self._add_all_constraints()
             self._validate_network_topology()
             self.logger.info("\n\nNetwork setup complete\n")
             return self.network
