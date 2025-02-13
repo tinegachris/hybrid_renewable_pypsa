@@ -142,6 +142,7 @@ class NetworkSetup:
         """Add transformers to the network with impedance and tap ratio specifications."""
         try:
             tx_tech_lib = self._tech_libraries['transformer']
+            self.network.transformer_types = tx_tech_lib.copy()
             for _, xfmr in self._network_components['transformers'].iterrows():
                 if xfmr['type'] not in tx_tech_lib.index:
                     raise NetworkSetupError(f"Transformer type {xfmr['type']} not found in tech library", component="Transformer")
@@ -157,15 +158,21 @@ class NetworkSetup:
         """Add transmission lines with type-based parameters."""
         try:
             line_types = self._tech_libraries['line_types']
+            self.network.line_types = line_types.copy()
+
             for _, line in self._network_components['lines'].iterrows():
                 if line['type'] not in line_types.index:
-                    raise NetworkSetupError(f"Line {line['name']} uses undefined type: {line['type']}", component="Line")
+                    raise NetworkSetupError(
+                        f"Line {line['name']} uses undefined type: {line['type']}",
+                        component="Line"
+                    )
                 line_specs = line_types.loc[line['type']]
                 line_data = {**line.to_dict(), **line_specs.to_dict()}
                 self.network.add("Line", **line_data)
             self.logger.info(f"Added {len(self._network_components['lines'])} lines")
         except Exception as e:
             raise NetworkSetupError(f"Error adding lines: {str(e)}", component="Lines")
+
 
     def _add_generators(self) -> None:
         """Add generators with capacity, efficiency, and cost specifications."""
