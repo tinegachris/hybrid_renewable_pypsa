@@ -25,7 +25,7 @@ class NetworkSetup:
         'electricity': {'color': '#2ca02c', 'co2_emissions': 0.5},
         'hydro': {'color': '#17becf', 'co2_emissions': 0},
         'solar': {'color': '#bcbd22', 'co2_emissions': 0},
-        }
+    }
 
     def __init__(self, data_folder: str) -> None:
         self.data_folder = Path(data_folder)
@@ -106,16 +106,17 @@ class NetworkSetup:
 
     def _load_constraints(self) -> None:
         """Load network constraints from the 'constraints' folder."""
-        contraints = ["global_constraints", "node_constraints", "branch_constraints"]
+        constraint_files = ["global_constraints.csv", "node_constraints.csv", "branch_constraints.csv"]
         try:
-            for constraint in contraints:
-                self._constraints[constraint] = self.data_loader.load_constraint(f"{constraint}.csv")
-            self.logger.info(f"Loaded {len(self.network.global_constraints)} global constraints")
+            for file in constraint_files:
+                key = file.split('.')[0]
+                self._constraints[key] = self.data_loader.load_constraint(file)
+            self.logger.info(f"Loaded constraints: {list(self._constraints.keys())}")
         except Exception as e:
             raise NetworkSetupError(f"Error loading constraints: {str(e)}", component="Constraints")
 
     def _load_profiles(self) -> None:
-        """Load time-series profiles for loads, generators, grid and storage units."""
+        """Load time-series profiles for loads, generators, grid, and storage units."""
         profile_types = ["load_profiles", "generator_profiles", "storage_profiles", "grid_profiles"]
         try:
             for profile_type in profile_types:
@@ -129,9 +130,7 @@ class NetworkSetup:
             raise NetworkSetupError(f"Error loading profiles: {str(e)}", component="Profiles")
 
     def _add_buses(self) -> None:
-        """
-        Add buses to the network with voltage levels and optional coordinates.
-        """
+        """Add buses to the network with voltage levels and optional coordinates."""
         try:
             for _, bus in self._network_components['buses'].iterrows():
                 self.network.add("Bus", **bus.to_dict())
@@ -140,61 +139,64 @@ class NetworkSetup:
             raise NetworkSetupError(f"Error adding buses: {str(e)}", component="Buses")
 
     def _add_transformers(self) -> None:
-        """
-        Add transformers to the network with impedance and tap ratio specifications.
-        """
+        """Add transformers to the network with impedance and tap ratio specifications."""
         try:
             tx_tech_lib = self._tech_libraries['transformer']
             for _, xfmr in self._network_components['transformers'].iterrows():
+                if xfmr['type'] not in tx_tech_lib.index:
+                    raise NetworkSetupError(f"Transformer type {xfmr['type']} not found in tech library", component="Transformer")
                 tech_specs = tx_tech_lib.loc[xfmr['type']]
-                self.network.add("Transformer", **xfmr.to_dict(),**tech_specs.to_dict())
+                # Merge CSV data with technology specs. You may include additional calculations if needed.
+                transformer_data = {**xfmr.to_dict(), **tech_specs.to_dict()}
+                self.network.add("Transformer", **transformer_data)
             self.logger.info(f"Added {len(self._network_components['transformers'])} transformers")
         except Exception as e:
             raise NetworkSetupError(f"Error adding transformers: {str(e)}", component="Transformers")
 
     def _add_lines(self) -> None:
-        """
-        Add transmission lines with type-based parameters.
-        """
+        """Add transmission lines with type-based parameters."""
         try:
             line_types = self._tech_libraries['line_types']
             for _, line in self._network_components['lines'].iterrows():
+                if line['type'] not in line_types.index:
+                    raise NetworkSetupError(f"Line {line['name']} uses undefined type: {line['type']}", component="Line")
                 line_specs = line_types.loc[line['type']]
-                self.network.add("Line", **line.to_dict(), **line_specs.to_dict())
+                line_data = {**line.to_dict(), **line_specs.to_dict()}
+                self.network.add("Line", **line_data)
             self.logger.info(f"Added {len(self._network_components['lines'])} lines")
         except Exception as e:
             raise NetworkSetupError(f"Error adding lines: {str(e)}", component="Lines")
 
     def _add_generators(self) -> None:
-        """
-        Add generators to the network with capacity, efficiency, and cost specifications.
-        """
+        """Add generators with capacity, efficiency, and cost specifications."""
         try:
             gen_tech_lib = self._tech_libraries['generator']
             for _, gen in self._network_components['generators'].iterrows():
+                if gen['type'] not in gen_tech_lib.index:
+                    raise NetworkSetupError(f"Generator type {gen['type']} not found in tech library", component="Generator")
                 tech_specs = gen_tech_lib.loc[gen['type']]
-                self.network.add("Generator", **{**gen.to_dict(), **tech_specs.to_dict()})
+                generator_data = {**gen.to_dict(), **tech_specs.to_dict()}
+                self.network.add("Generator", **generator_data)
             self.logger.info(f"Added {len(self._network_components['generators'])} generators")
         except Exception as e:
             raise NetworkSetupError(f"Error adding generators: {str(e)}", component="Generators")
 
     def _add_storage_units(self) -> None:
-        """
-        Add storage units to the network with capacity, efficiency, and degradation specifications.
-        """
+        """Add storage units with capacity, efficiency, and degradation specifications."""
         try:
             storage_tech_lib = self._tech_libraries['storage']
             for _, storage in self._network_components['storage_units'].iterrows():
+                if storage['type'] not in storage_tech_lib.index:
+                    raise NetworkSetupError(f"Storage type {storage['type']} not found in tech library", component="StorageUnit")
                 tech_specs = storage_tech_lib.loc[storage['type']]
-                self.network.add("StorageUnit", **storage.to_dict(), **tech_specs.to_dict())
+                storage_data = {**storage.to_dict(), **tech_specs.to_dict()}
+                self.network.add("StorageUnit", **storage_data)
             self.logger.info(f"Added {len(self._network_components['storage_units'])} storage units")
         except Exception as e:
             raise NetworkSetupError(f"Error adding storage units: {str(e)}", component="Storage Units")
 
     def _add_links(self) -> None:
-        """
-        Add power conversion links to the network with efficiency and cost specifications.
-        """
+        """Add power conversion links with efficiency and cost specifications."""
         try:
             for _, link in self._network_components['links'].iterrows():
                 self.network.add("Link", **link.to_dict())
@@ -203,11 +205,10 @@ class NetworkSetup:
             raise NetworkSetupError(f"Error adding links: {str(e)}", component="Links")
 
     def _add_loads(self) -> None:
-        """
-        Add loads to the network with power profiles and constraints.
-        """
+        """Add loads to the network with power profiles and constraints."""
         try:
             for _, load in self._network_components['loads'].iterrows():
+                # Load profile for each load is loaded separately. Here we assume the load CSV includes a 'profile_id'
                 load_profile = self.data_loader.load_profile(load['profile_id'], profile_type="load_profiles")
                 self.network.add("Load", **load.to_dict())
             self.logger.info(f"Added {len(self._network_components['loads'])} loads")
@@ -215,10 +216,7 @@ class NetworkSetup:
             raise NetworkSetupError(f"Error adding loads: {str(e)}", component="Loads")
 
     def _add_all_components(self) -> None:
-        """
-        Add network components (buses, lines, generators, loads, storage, transformers, links)
-        from the 'components' folder.
-        """
+        """Add all network components in the proper order."""
         component_adders = [
             self._add_buses,
             self._add_transformers,
@@ -228,7 +226,6 @@ class NetworkSetup:
             self._add_links,
             self._add_loads
         ]
-
         try:
             for add_component in component_adders:
                 add_component()
@@ -237,36 +234,32 @@ class NetworkSetup:
             raise NetworkSetupError(f"Error adding components: {str(e)}", component="Components")
 
     def _add_constraints(self) -> None:
-        """
-        Apply loaded constraints to the network.
-        """
+        """Apply loaded constraints to the network."""
         try:
+            # Iterate over each constraint file (global, node, branch, etc.)
             for constraint_type, constraints in self._constraints.items():
-                for _, constraint in constraints.iterrows():
-                    self.network.add("GlobalConstraint", **constraint.to_dict())
+                for idx, constraint in constraints.iterrows():
+                    constraint_dict = constraint.to_dict()
+                    # Ensure a 'name' is provided; if missing, generate a default name
+                    if "name" not in constraint_dict or pd.isna(constraint_dict["name"]):
+                        constraint_dict["name"] = f"{constraint_type}_{idx}"
+                    self.network.add("GlobalConstraint", **constraint_dict, overwrite=True)
             self.logger.info("Applied all network constraints")
         except Exception as e:
             raise NetworkSetupError(f"Error applying constraints: {str(e)}", component="Constraints")
 
     def _validate_network_topology(self) -> None:
         """
-        Validate the network topology to ensure all components are connected and the system is consistent.
-        This typically runs PyPSA's built-in consistency check.
+        Validate network topology to ensure all components are connected and the system is consistent.
         """
         try:
-            self.network.consistency_check()  # Raises error if inconsistency found
+            self.network.consistency_check()  # Raises error if inconsistencies are found
             self.logger.info("Network topology validated successfully")
         except Exception as e:
             raise NetworkSetupError(f"Network topology validation failed: {str(e)}", component="Topology")
 
-    def get_network(self) -> pypsa.Network:
-        """Retrieve the network object for external use."""
-        return self.network
-
     def _cleanup_resources(self) -> None:
-        """
-        Cleanup temporary resources or perform any rollback actions in case of errors during network setup.
-        """
+        """Cleanup resources if an error occurs during network setup."""
         self.logger.info("Cleaning up temporary resources...")
         self.network = None
         self._tech_libraries.clear()
@@ -275,18 +268,21 @@ class NetworkSetup:
         self._constraints.clear()
 
     def setup_network(self) -> pypsa.Network:
-        """Orchestrate network build process with rollback support."""
+        """Orchestrate the network build process with rollback support."""
         try:
             self._add_all_components()
             self._add_constraints()
             self._validate_network_topology()
             self.logger.info("\n\nNetwork setup complete\n")
             return self.network
-
         except Exception as e:
             self.logger.error(f"Network build failed: {str(e)}")
             self._cleanup_resources()
             raise
+
+    def get_network(self) -> pypsa.Network:
+        """Retrieve the network object for external use."""
+        return self.network
 
 def main() -> None:
     """Main execution with performance monitoring."""
