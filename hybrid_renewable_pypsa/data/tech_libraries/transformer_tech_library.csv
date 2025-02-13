@@ -1,6 +1,6 @@
-type,f_nom,v_nom_0,v_nom_1,vsc,vscr,pfe,i0,phase_shift,tap_side,tap_neutral,tap_min,tap_max,tap_step
-Transformer_Load,50,0.415,0.415,0.04,0.01,1,0.003,0,0,0,-5,5,0.01
-Transformer_Grid,50,33,0.415,0.1,0.02,2,0.004,0,0,0,-5,5,0.01
-Transformer_Hydro_Step_Up,50,0.415,11,0.08,0.015,1.5,0.003,0,0,0,-5,5,0.01
-Transformer_Hydro_Step_Down,50,11,0.415,0.08,0.015,1.5,0.003,0,0,0,-5,5,0.01
-Transformer_Battery,50,0.8,0.415,0.05,0.01,1,0.003,0,0,0,-5,5,0.01
+type,f_nom,s_nom,v_nom_0,v_nom_1,vsc,vscr,pfe,i0,phase_shift,tap_side,tap_neutral,tap_min,tap_max,tap_step
+Transformer_Load,50,0.5,0.415,0.415,0.04,0.01,1,0.003,0,0,0,-5,5,0.01
+Transformer_Grid,50,10,33,0.415,0.1,0.02,2,0.004,0,0,0,-5,5,0.01
+Transformer_Hydro_Step_Up,50,5,0.415,11,0.08,0.015,1.5,0.003,0,0,0,-5,5,0.01
+Transformer_Hydro_Step_Down,50,5,11,0.415,0.08,0.015,1.5,0.003,0,0,0,-5,5,0.01
+Transformer_Battery,50,2,0.8,0.415,0.05,0.01,1,0.003,0,0,0,-5,5,0.01
