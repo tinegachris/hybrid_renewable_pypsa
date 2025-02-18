@@ -1,0 +1,6 @@
+name,bus0,bus1,type,length,s_nom,capital_cost,carrier,description
+Line_Grid_to_AC_415V,Grid_IN_AC_415V,Main_AC_415V,grid_incomer,0.5,10000,100000,AC,Connects utility grid (415V) to main ACDB
+Line_Hydro_to_AC_415V,Hydro_IN_AC_415V,Main_AC_415V,hydro_incomer,1.0,5000,80000,AC,Connects hydro output (415V) to main ACDB
+Line_Hydro_11kV,Hydro_IN_AC_11kV,Hydro_OUT_AC_11kV,overhead_11kV,2.0,5000,120000,AC,Connects hydro input (11kV) to hydro output (11kV)
+Line_Battery_to_AC_415V,BAT_AC_415V,Main_AC_415V,battery_incomer,0.3,2000,50000,AC,Connects battery (415V) to main ACDB
+Line_Solar_to_AC_415V,PV_AC_415V,Main_AC_415V,solar_incomer,0.2,2000,40000,AC,Connects solar PV (415V) to main ACDB

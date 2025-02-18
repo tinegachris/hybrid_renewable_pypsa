@@ -1,0 +1,6 @@
+name,parameter,operator,value,unit,description
+Line_Grid_to_AC_415V,loading,<=,100,%,Ensure line loading does not exceed 100% of its thermal rating.
+Line_Hydro_to_AC_415V,loading,<=,100,%,Ensure line loading does not exceed 100% of its thermal rating.
+Line_Hydro_11kV,loading,<=,100,%,Thermal limit for the 11kV hydro interconnection.
+Line_Battery_to_AC_415V,loading,<=,100,%,Thermal limit for the battery connection line.
+Line_Solar_to_AC_415V,loading,<=,100,%,Thermal limit for the solar connection line.

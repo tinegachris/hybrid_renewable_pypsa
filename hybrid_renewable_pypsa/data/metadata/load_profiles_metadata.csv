@@ -1,0 +1,11 @@
+profile_id,load_type,voltage_kV,time_zone,power_factor,data_source,description
+residential_1,residential,0.415,UTC+00,0.9,synthetic,Residential area 1
+residential_2,residential,0.415,UTC+00,0.9,synthetic,Residential area 2
+residential_3,residential,0.415,UTC+00,0.9,synthetic,Suburban housing
+residential_4,residential,0.415,UTC+00,0.9,synthetic,Urban apartments
+commercial_1,commercial,0.415,UTC+00,0.9,synthetic,Commercial complex A
+commercial_2,commercial,0.415,UTC+00,0.9,synthetic,Shopping district
+commercial_3,commercial,0.415,UTC+00,0.9,synthetic,Office park
+industrial_1,industrial,0.415,UTC+00,0.9,synthetic,Factory zone 1
+industrial_2,industrial,0.415,UTC+00,0.9,synthetic,Factory zone 2
+industrial_3,industrial,0.415,UTC+00,0.9,synthetic,Processing plant

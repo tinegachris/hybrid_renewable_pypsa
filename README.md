@@ -1,109 +1,147 @@
 # Hybrid Renewable PyPSA Network Analysis
 
-[![Github license](https://img.shields.io/github/license/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/blob/main/LICENSE)
-[![GitHub contributors](https://img.shields.io/github/contributors/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/graphs/contributors)
-[![GitHub issues](https://img.shields.io/github/issues/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/issues)
-[![GitHub pull-requests](https://img.shields.io/github/issues-pr/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/pulls)
+[![GitHub License](https://img.shields.io/github/license/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/blob/main/LICENSE)
+[![GitHub Contributors](https://img.shields.io/github/contributors/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/graphs/contributors)
+[![GitHub Issues](https://img.shields.io/github/issues/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/tinegachris/hybrid_renewable_pypsa.svg)](https://github.com/tinegachris/hybrid_renewable_pypsa/pulls)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![GitHub watchers](https://img.shields.io/github/watchers/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Watch)](https://github.com/tinegachris/hybrid_renewable_pypsa/watchers)
-[![GitHub forks](https://img.shields.io/github/forks/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Fork)](https://github.com/tinegachris/hybrid_renewable_pypsa/network/members)
-[![GitHub stars](https://img.shields.io/github/stars/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Star)](https://github.com/tinegachris/hybrid_renewable_pypsa/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Star)](https://github.com/tinegachris/hybrid_renewable_pypsa/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Fork)](https://github.com/tinegachris/hybrid_renewable_pypsa/network/members)
+[![GitHub Watchers](https://img.shields.io/github/watchers/tinegachris/hybrid_renewable_pypsa.svg?style=social&label=Watch)](https://github.com/tinegachris/hybrid_renewable_pypsa/watchers)
 
-![pypsa_cover](https://github.com/user-attachments/assets/931c8053-ea86-47ee-acb4-826bf21262ae)
+![PyPSA Cover](https://github.com/user-attachments/assets/931c8053-ea86-47ee-acb4-826bf21262ae)
 
-This project involves the analysis of a hybrid renewable energy network using PyPSA (Python for Power System Analysis).
+This project leverages **PyPSA** (Python for Power System Analysis) to model and analyze hybrid renewable energy networks. It focuses on optimizing network design for cost, reliability, and efficiency by simulating energy flows, identifying bottlenecks, and comparing various scenarios.
+
+---
 
 ## Overview
 
-This project uses PyPSA, a Python library for simulating and optimizing power systems, to analyze a hybrid renewable energy network incorporating various static network components. The goal is to optimize network design for cost and reliability. This analysis will model energy flows, identify bottlenecks, and compare different scenarios to enhance the overall efficiency and performance of the network.
+The project aims to:
+- Model hybrid renewable energy systems incorporating wind, solar, and battery storage.
+- Perform optimal power flow analysis to identify inefficiencies.
+- Visualize network topology and energy flows.
+- Compare different scenarios to enhance system performance.
+
+---
 
 ## Features
 
-- Models wind, solar, and battery storage
-- Performs optimal power flow analysis
-- Supports different network topologies
-- Provides detailed network visualization
-- Identifies network bottlenecks and inefficiencies
-- Compares different energy scenarios for optimization
+- **Hybrid Energy Modeling**: Supports wind, solar, and battery storage integration.
+- **Optimal Power Flow**: Performs cost and reliability optimization.
+- **Network Visualization**: Provides detailed visualizations of network components and energy flows.
+- **Scenario Comparison**: Evaluates different configurations for improved efficiency.
+- **Bottleneck Identification**: Highlights inefficiencies and critical paths in the network.
+
+---
 
 ## Project Structure
 
-The project is organized as follows:
+```
+Hybrid Renewable PyPSA Network Analysis/
+├── .github/                # CI/CD workflows
+├── data/                   # Input data (e.g., wind, solar, load profiles)
+├── docs/                   # Project documentation
+├── hybrid_renewable_pypsa/
+│   ├── src/                # Source code for network setup, analysis, and visualization
+│   └── utils/              # Utility functions and logging
+├── results/                # Output results (e.g., plots, optimization results)
+├── tests/                  # Unit tests
+├── .gitignore              # Files to ignore in version control
+├── Dockerfile              # Containerization setup
+├── poetry.lock             # Dependency lock file
+├── pyproject.toml          # Project dependencies and metadata
+└── README.md               # Project overview
+```
 
-- `src/`: Contains the main source code for network setup, plotting, and analysis.
-- `data/`: Contains input data for the network analysis.
-- `docs/`: Documentation files for the project.
-- `results/`: Output results from the analysis.
-- `.github/workflows/`: CI/CD workflow configuration.
+---
 
 ## Getting Started
 
-To get started with this project, follow these steps:
-
 ### Prerequisites
 
-- Python 3.10.4 or higher
-- Poetry 2.0.1 or higher
+- **Python 3.10.4 or higher**
+- **Poetry 2.0.1 or higher** (for dependency management)
 
 ### Installation
 
-**Clone the repository:**
+1. **Clone the Repository**:
 
-```sh
-git clone https://github.com/tinegachris/hybrid_renewable_pypsa.git
-cd hybrid_renewable_pypsa
-```
+  ```sh
+  git clone https://github.com/tinegachris/hybrid_renewable_pypsa.git
+  cd hybrid_renewable_pypsa
+  ```
 
-**Install Poetry:**
+2. **Install Poetry (if not already installed)**:
 
-If you don't have Poetry installed, you can install it using the following command:
+  ```sh
+  curl -sSL https://install.python-poetry.org | python3 -
+  ```
 
-```sh
-curl -sSL https://install.python-poetry.org | python3 -
-```
+3. **Install Dependencies**:
 
-**Install the required dependencies:**
-
-```sh
-poetry install
-```
+  ```sh
+  poetry install
+  ```
 
 ### Usage
 
-**Run the network setup:**
+1. **Run Network Setup**:
 
-```sh
-poetry run python -m src.network_setup
-```
+  ```sh
+  poetry run python -m hybrid_renewable_pypsa.src.network_setup
+  ```
 
-**Run the network analysis:**
+2. **Run Network Analysis**:
 
-```sh
-poetry run python -m src.network_analysis
-```
+  ```sh
+  poetry run python -m hybrid_renewable_pypsa.src.network_analysis
+  ```
 
-**Plot the network:**
+3. **Plot Network**:
 
-```sh
-poetry run python -m src.network_plot
-```
+  ```sh
+  poetry run python -m hybrid_renewable_pypsa.src.network_plot
+  ```
+
+---
 
 ## Data
 
-Input data for the network analysis is located in the `data/` directory. This includes CSV files containing hourly wind and solar generation data.
+Input data for the network analysis is stored in the `data/` directory. This includes:
+
+- **CSV files**: Hourly wind, solar, and load profiles.
+- **Configuration files**: Network parameters and settings.
+
+---
 
 ## Results
 
-Output results from the analysis are stored in the `results/` directory. This includes network diagrams, optimized power flow solutions, and key performance indicators.
+Outputs are saved in the `results/` directory, including:
+
+- **Network diagrams**: Visual representations of the network.
+- **Optimized power flow solutions**: Results from the optimization process.
+- **Key performance indicators**: Metrics for evaluating network performance.
+
+---
 
 ## Contributing
 
-Contributions are welcome! Please open an issue to discuss proposed changes or submit a pull request.
+Contributions are welcome! Please follow these steps:
+
+1. Open an issue to discuss proposed changes.
+2. Fork the repository and create a new branch.
+3. Submit a pull request with your changes.
+
+---
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/tinegachris/hybrid_renewable_pypsa/blob/main/LICENSE) file for details.
+
+---
 
 ## Acknowledgements
 
-- [PyPSA Documentation](https://pypsa.readthedocs.io/en/latest/)
+- **PyPSA Documentation**
+- The open-source community for their invaluable tools and resources.

@@ -1,0 +1,7 @@
+bus,parameter,operator,value,unit,description
+Main_AC_415V,voltage_max,<=,1.05,pu,Maximum voltage at the Main AC bus.
+Main_AC_415V,voltage_min,>=,0.95,pu,Minimum voltage at the Main AC bus.
+Load_AC_415V,voltage_max,<=,1.05,pu,Maximum voltage at the Load AC bus.
+Load_AC_415V,voltage_min,>=,0.95,pu,Minimum voltage at the Load AC bus.
+Grid_IN_AC_33kV,voltage_max,<=,1.05,pu,Maximum voltage at the Grid 33kV bus.
+Grid_IN_AC_33kV,voltage_min,>=,0.95,pu,Minimum voltage at the Grid 33kV bus.
