@@ -51,7 +51,7 @@ class NetworkAnalysis:
         """Check the consistency of the network."""
         self.logger.info("Running consistency check...")
         try:
-            self.network.consistency_check()  # Raises error if inconsistencies are found
+            self.network.consistency_check()
         except Exception as e:
             self.logger.error(f"Consistency check error: {e}")
             raise
@@ -69,7 +69,7 @@ class NetworkAnalysis:
             self.logger.error("Power Flow analysis failed:")
             self.logger.error(traceback.format_exc())
             raise Exception(f"Power Flow analysis failed: {str(e)}")
-        
+
         self.logger.info("Power Flow analysis completed successfully.")
         try:
             bus_voltages = self.network.buses_t.get('v_mag_pu', pd.DataFrame()).copy()
@@ -79,7 +79,7 @@ class NetworkAnalysis:
             self.logger.error("Error extracting power flow results:")
             self.logger.error(traceback.format_exc())
             raise Exception(f"Error extracting PF results: {str(e)}")
-        
+
         return {
             "bus_voltages": bus_voltages,
             "line_flows": line_flows,
