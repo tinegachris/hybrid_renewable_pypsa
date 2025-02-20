@@ -6,7 +6,7 @@ from matplotlib.axes import Axes
 from hybrid_renewable_pypsa.src.data_loader import DataLoader
 from hybrid_renewable_pypsa.src.network_setup import NetworkSetup
 from hybrid_renewable_pypsa.src.logger_setup import LoggerSetup
-import plotly.graph_objects as go  # for interactive plotting
+import plotly.graph_objects as go
 
 class NetworkPlotError(Exception):
     """Custom exception for network plotting errors."""
@@ -193,11 +193,12 @@ class NetworkPlot:
     def main(self) -> None:
         """Main method to plot the network."""
         self.logger.info(f'Plotting {len(self.network.buses)} buses and {len(self.network.lines)} lines...')
-        # Choose which plot to show:
-        # For static plot:
-        # self.plot_network_static(save_path="hybrid_renewable_pypsa/results/network_plot.png", show_map=True)
-        # For interactive plot (uncomment to use):
-        self.plot_network_interactive(save_path="hybrid_renewable_pypsa/results/network_interactive.html")
+
+        # Static plot:
+        self.plot_network_static(save_path="hybrid_renewable_pypsa/results/network_plot.png", show_map=True)
+
+        # Interactive plot
+        # self.plot_network_interactive(save_path="hybrid_renewable_pypsa/results/network_interactive.html")
 
 if __name__ == '__main__':
     data_folder = 'hybrid_renewable_pypsa/data'
