@@ -1,7 +1,6 @@
 import pypsa
 import pandas as pd
-import numpy as np
-from typing import Dict, Optional
+from typing import Optional
 from pathlib import Path
 from hybrid_renewable_pypsa.src.data_loader import DataLoader
 from hybrid_renewable_pypsa.src.logger_setup import LoggerSetup
