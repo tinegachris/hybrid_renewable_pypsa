@@ -58,11 +58,9 @@ The project aims to:
 ```sh
 Hybrid Renewable PyPSA Network Analysis/
 ├── config/                      # Configuration files (anticipated)
-│   └── (your config files here)
+│   └── (no files at the moment)
 ├── cwd/                         # Standalone scripts for generating profiles
-│   ├── generate_generator_profiles.py
-│   ├── generate_grid_import_profiles.py
-│   └── generate_load_profiles.py
+│   └── profiles_generator.ipynb
 ├── data/
 │   ├── components/              # Component definitions (buses, generators, etc.)
 │   │   ├── buses.csv
@@ -120,7 +118,7 @@ Hybrid Renewable PyPSA Network Analysis/
 └── LICENSE                      # Project license
 
 tests/                          # Tests for the code in the src folder
-│   └── (your test scripts here)
+│   └── (test scripts)
 docs/                           # Sphinx-generated documentation
 │   └── (documentation build output)
 .github/                        # GitHub workflows and CI/CD configurations
