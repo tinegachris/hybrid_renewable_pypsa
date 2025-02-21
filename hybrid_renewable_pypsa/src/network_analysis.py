@@ -1,9 +1,9 @@
+import traceback
+from typing import Dict, Any
+import pandas as pd
 from hybrid_renewable_pypsa.src.network_setup import NetworkSetup
 from hybrid_renewable_pypsa.src.data_loader import DataLoader
 from hybrid_renewable_pypsa.src.logger_setup import LoggerSetup
-from typing import Dict, Any
-import pandas as pd
-import traceback
 
 class NetworkAnalysisError(Exception):
     """Custom exception for network analysis errors."""
@@ -14,13 +14,13 @@ class NetworkAnalysis:
     NetworkAnalysis class for analyzing a PyPSA network.
     
     This class performs various analyses:
-        - Consistency check
-        - Power flow (PF) analysis
-        - Optimal power flow (OPF) analysis
-        - Storage system performance analysis
-        - Reliability analysis (e.g. unmet demand)
-        - Load shift analysis
-        - Losses analysis
+      - Consistency check
+      - Power flow (PF) analysis
+      - Optimal power flow (OPF) analysis
+      - Storage system performance analysis
+      - Reliability analysis (e.g. unmet demand)
+      - Load shift analysis
+      - Losses analysis
     """
     def __init__(self, data_folder: str) -> None:
         self.data_loader = DataLoader(data_folder)
@@ -28,7 +28,7 @@ class NetworkAnalysis:
         self.network_setup.setup_network()
         self.network = self.network_setup.get_network()
         self.logger = LoggerSetup.setup_logger('NetworkAnalysis')
-    
+
     def analyze_network(self) -> Dict[str, Any]:
         """Run all analysis methods and return a summary of results."""
         self.logger.info("Starting network analysis...")
@@ -44,6 +44,7 @@ class NetworkAnalysis:
             self.logger.info("Network analysis completed successfully!")
         except Exception as e:
             self.logger.error(f"Network analysis failed: {e}")
+            self.logger.error(traceback.format_exc())
             raise NetworkAnalysisError(f"Analysis failed: {e}")
         return results
 
@@ -51,9 +52,10 @@ class NetworkAnalysis:
         """Check the consistency of the network."""
         self.logger.info("Running consistency check...")
         try:
-            self.network.consistency_check()
+            self.network.consistency_check()  # Raises error if inconsistencies are found
         except Exception as e:
             self.logger.error(f"Consistency check error: {e}")
+            self.logger.error(traceback.format_exc())
             raise
         self.logger.info("Consistency check completed successfully.")
         return True
@@ -72,9 +74,9 @@ class NetworkAnalysis:
 
         self.logger.info("Power Flow analysis completed successfully.")
         try:
-            bus_voltages = self.network.buses_t.get('v_mag_pu', pd.DataFrame()).copy()
-            line_flows = self.network.lines_t.get('p0', pd.DataFrame()).copy()
-            generator_dispatch = self.network.generators_t.get('p', pd.DataFrame()).copy()
+            bus_voltages = self.network.buses_t.get("v_mag_pu", pd.DataFrame()).copy()
+            line_flows = self.network.lines_t.get("p0", pd.DataFrame()).copy()
+            generator_dispatch = self.network.generators_t.get("p", pd.DataFrame()).copy()
         except Exception as e:
             self.logger.error("Error extracting power flow results:")
             self.logger.error(traceback.format_exc())
@@ -93,15 +95,17 @@ class NetworkAnalysis:
             self.network.optimize()
         except Exception as e:
             self.logger.error(f"OPF optimization failed: {e}")
-            raise
+            self.logger.error(traceback.format_exc())
+            raise Exception(f"OPF optimization failed: {str(e)}")
         self.logger.info("Optimal Power Flow analysis completed successfully.")
         try:
-            generator_dispatch = self.network.generators_t.p.copy()
-            storage_dispatch = self.network.storage_units_t.get('p', pd.DataFrame()).copy()
-            marginal_costs = self.network.buses_t.get('marginal_price', pd.DataFrame()).copy()
+            generator_dispatch = self.network.generators_t.get("p", pd.DataFrame()).copy()
+            storage_dispatch = self.network.storage_units_t.get("p", pd.DataFrame()).copy()
+            marginal_costs = self.network.buses_t.get("marginal_price", pd.DataFrame()).copy()
         except Exception as e:
             self.logger.error(f"Error extracting OPF results: {e}")
-            raise
+            self.logger.error(traceback.format_exc())
+            raise Exception(f"Error extracting OPF results: {str(e)}")
         return {
             "generator_dispatch": generator_dispatch,
             "storage_dispatch": storage_dispatch,
@@ -112,11 +116,12 @@ class NetworkAnalysis:
         """Analyze storage system performance over time."""
         self.logger.info("Running Storage analysis...")
         try:
-            storage_dispatch = self.network.storage_units_t.get('p', pd.DataFrame()).copy()
-            state_of_charge = self.network.storage_units_t.get('state_of_charge', pd.DataFrame()).copy()
+            storage_dispatch = self.network.storage_units_t.get("p", pd.DataFrame()).copy()
+            state_of_charge = self.network.storage_units_t.get("state_of_charge", pd.DataFrame()).copy()
         except Exception as e:
             self.logger.error(f"Error during storage analysis: {e}")
-            raise
+            self.logger.error(traceback.format_exc())
+            raise Exception(f"Storage analysis failed: {str(e)}")
         self.logger.info("Storage analysis completed successfully.")
         return {
             "storage_dispatch": storage_dispatch,
@@ -127,10 +132,12 @@ class NetworkAnalysis:
         """Evaluate the reliability of the network."""
         self.logger.info("Running Reliability analysis...")
         try:
-            unmet_demand = (self.network.loads_t.p_set - self.network.loads_t.p).sum().sum()
+            unmet_demand = (self.network.loads_t.get("p_set", pd.DataFrame()) - 
+                            self.network.loads_t.get("p", pd.DataFrame())).sum().sum()
         except Exception as e:
             self.logger.error(f"Error during reliability analysis: {e}")
-            raise
+            self.logger.error(traceback.format_exc())
+            raise Exception(f"Reliability analysis failed: {str(e)}")
         self.logger.info(f"Unmet demand: {unmet_demand}")
         self.logger.info("Reliability analysis completed successfully.")
         return {"unmet_demand": unmet_demand}
@@ -139,12 +146,13 @@ class NetworkAnalysis:
         """Evaluate the impact of shifting loads to off-peak hours."""
         self.logger.info("Running Load Shift analysis...")
         try:
-            peak_load = self.network.loads_t.p_set.max().sum()
-            off_peak_load = self.network.loads_t.p_set.min().sum()
+            peak_load = self.network.loads_t.get("p_set", pd.DataFrame()).max().sum()
+            off_peak_load = self.network.loads_t.get("p_set", pd.DataFrame()).min().sum()
             load_shift_potential = peak_load - off_peak_load
         except Exception as e:
             self.logger.error(f"Error during load shift analysis: {e}")
-            raise
+            self.logger.error(traceback.format_exc())
+            raise Exception(f"Load shift analysis failed: {str(e)}")
         self.logger.info(f"Load shift potential: {load_shift_potential}")
         self.logger.info("Load Shift analysis completed successfully.")
         return {"load_shift_potential": load_shift_potential}
@@ -153,13 +161,17 @@ class NetworkAnalysis:
         """Evaluate losses in the network."""
         self.logger.info("Running Losses analysis...")
         try:
-            line_losses = (self.network.lines_t.p0 - self.network.lines_t.p1).sum().sum()
-            bus_losses = (self.network.buses_t.p_set.sum(axis=1) - self.network.buses_t.p.sum(axis=1)).sum()
-            transformer_losses = (self.network.transformers_t.p0 - self.network.transformers_t.p1).sum().sum()
+            line_losses = (self.network.lines_t.get("p0", pd.DataFrame()) - 
+                           self.network.lines_t.get("p1", pd.DataFrame())).sum().sum()
+            bus_losses = (self.network.buses_t.get("p_set", pd.DataFrame()).sum(axis=1) - 
+                          self.network.buses_t.get("p", pd.DataFrame()).sum(axis=1)).sum()
+            transformer_losses = (self.network.transformers_t.get("p0", pd.DataFrame()) - 
+                                  self.network.transformers_t.get("p1", pd.DataFrame())).sum().sum()
             total_losses = line_losses + bus_losses + transformer_losses
         except Exception as e:
             self.logger.error(f"Error during losses analysis: {e}")
-            raise
+            self.logger.error(traceback.format_exc())
+            raise Exception(f"Losses analysis failed: {str(e)}")
         self.logger.info(f"Line losses: {line_losses}")
         self.logger.info(f"Bus losses: {bus_losses}")
         self.logger.info(f"Transformer losses: {transformer_losses}")
