@@ -6,7 +6,6 @@ from matplotlib.axes import Axes
 from hybrid_renewable_pypsa.src.data_loader import DataLoader
 from hybrid_renewable_pypsa.src.network_setup import NetworkSetup
 from hybrid_renewable_pypsa.src.logger_setup import LoggerSetup
-import plotly.graph_objects as go
 
 class NetworkPlotError(Exception):
     """Custom exception for network plotting errors."""
@@ -123,7 +122,7 @@ class NetworkPlot:
                     color=config["color"], transform=ccrs.PlateCarree(),
                     zorder=5, label=config["label"])
             ax.text(bus.x, bus.y, storage_unit.name, transform=ccrs.PlateCarree(),
-                    fontsize=8, zorder=5, ha='right')
+                    fontsize=8, zorder=5, ha='left')
 
     def plot_links(self, ax: Axes) -> None:
         """Plot links on the map."""
@@ -173,32 +172,10 @@ class NetworkPlot:
             self.logger.info(f"Static plot saved to {save_path}.")
         plt.show()
 
-    def plot_network_interactive(self, save_path: Optional[str] = None) -> None:
-        """
-        Plot an interactive network using PyPSA's built-in iplot method.
-        Returns a Plotly Figure that can be displayed or saved as HTML.
-        """
-        # Use PyPSA's interactive plotting. Setting asFigure=True returns a Plotly Figure.
-        fig_dict = self.network.iplot()
-        fig = go.Figure(fig_dict)
-        fig.update_layout(
-            title="Hybrid Renewable Network - Interactive Plot",
-            margin=dict(l=0, r=0, t=30, b=0)
-        )
-        if save_path:
-            fig.write_html(save_path)
-            self.logger.info(f"Interactive plot saved to {save_path}.")
-        fig.show()
-
     def main(self) -> None:
         """Main method to plot the network."""
         self.logger.info(f'Plotting {len(self.network.buses)} buses and {len(self.network.lines)} lines...')
-
-        # Static plot:
-        self.plot_network_static(save_path="hybrid_renewable_pypsa/results/network_plot.png", show_map=True)
-
-        # Interactive plot
-        # self.plot_network_interactive(save_path="hybrid_renewable_pypsa/results/network_interactive.html")
+        self.plot_network_static(save_path="hybrid_renewable_pypsa/results/network_plot.png", show_map=False)
 
 if __name__ == '__main__':
     data_folder = 'hybrid_renewable_pypsa/data'
