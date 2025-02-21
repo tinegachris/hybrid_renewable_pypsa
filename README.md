@@ -15,9 +15,27 @@ This project leverages **PyPSA** (Python for Power System Analysis) to model and
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Usage](#usage)
+- [Data](#data)
+- [Results](#results)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+
+---
+
 ## Overview
 
 The project aims to:
+
 - Model hybrid renewable energy systems incorporating wind, solar, and battery storage.
 - Perform optimal power flow analysis to identify inefficiencies.
 - Visualize network topology and energy flows.
@@ -37,21 +55,77 @@ The project aims to:
 
 ## Project Structure
 
-```
+```sh
 Hybrid Renewable PyPSA Network Analysis/
-├── .github/                # CI/CD workflows
-├── data/                   # Input data (e.g., wind, solar, load profiles)
-├── docs/                   # Project documentation
-├── hybrid_renewable_pypsa/
-│   ├── src/                # Source code for network setup, analysis, and visualization
-│   └── utils/              # Utility functions and logging
-├── results/                # Output results (e.g., plots, optimization results)
-├── tests/                  # Unit tests
-├── .gitignore              # Files to ignore in version control
-├── Dockerfile              # Containerization setup
-├── poetry.lock             # Dependency lock file
-├── pyproject.toml          # Project dependencies and metadata
-└── README.md               # Project overview
+├── config/                      # Configuration files (anticipated)
+│   └── (your config files here)
+├── cwd/                         # Standalone scripts for generating profiles
+│   ├── generate_generator_profiles.py
+│   ├── generate_grid_import_profiles.py
+│   └── generate_load_profiles.py
+├── data/
+│   ├── components/              # Component definitions (buses, generators, etc.)
+│   │   ├── buses.csv
+│   │   ├── generators.csv
+│   │   ├── loads.csv
+│   │   ├── storage_units.csv
+│   │   ├── lines.csv
+│   │   ├── transformers.csv
+│   │   └── links.csv
+│   ├── tech_libraries/          # Technology libraries
+│   │   ├── generator_tech_library.csv
+│   │   ├── storage_tech_library.csv
+│   │   ├── transformer_tech_library.csv
+│   │   └── line_types.csv
+│   ├── constraints/             # Constraint definitions
+│   │   ├── global_constraints.csv
+│   │   ├── node_constraints.csv
+│   │   └── branch_constraints.csv
+│   ├── profiles/                # Time-series profiles
+│   │   ├── load_profiles/
+│   │   │   ├── residential_1.csv
+│   │   │   ├── residential_2.csv
+│   │   │   ├── residential_3.csv
+│   │   │   ├── residential_4.csv
+│   │   │   ├── commercial_1.csv
+│   │   │   ├── commercial_2.csv
+│   │   │   ├── commercial_3.csv
+│   │   │   ├── industrial_1.csv
+│   │   │   ├── industrial_2.csv
+│   │   │   └── industrial_3.csv
+│   │   ├── generator_profiles/
+│   │   │   ├── solar-p_max_pu.csv
+│   │   │   └── hydro-p_max_pu.csv
+│   │   ├── grid_profiles/
+│   │   │   └── grid_import_p_max_pu.csv
+│   │   └── storage_profiles/    # (Optional storage profiles)
+│   ├── metadata/                # Metadata for profiles and other data
+│   │   ├── load_profiles_metadata.csv
+│   │   ├── generator_profiles_metadata.csv
+│   │   └── grid_profiles_metadata.csv
+│   └── documentation/           # Project documentation and supplementary info
+│       ├── README.md            # Additional docs if needed
+│       └── LICENSE
+├── results/                     # Output files (plots, analysis results, etc.)
+│   ├── network_plot.png
+│   └── network_interactive.html
+├── src/                         # Python source code for the project
+│   ├── data_loader.py
+│   ├── logger_setup.py
+│   ├── network_setup.py
+│   ├── network_plot.py
+│   └── network_analysis.py
+├── pyproject.toml               # Poetry configuration and dependencies
+├── README.md                    # Project overview
+└── LICENSE                      # Project license
+
+tests/                          # Tests for the code in the src folder
+│   └── (your test scripts here)
+docs/                           # Sphinx-generated documentation
+│   └── (documentation build output)
+.github/                        # GitHub workflows and CI/CD configurations
+│   └── workflows/
+│       └── ci.yml
 ```
 
 ---
