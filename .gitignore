@@ -47,3 +47,9 @@ _build/
 
 # tempCodeRunnerFile
 tempCodeRunnerFile.py
+
+# mypy
+.mypy_cache/
+
+# poetry
+poetry.lock
