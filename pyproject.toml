@@ -27,3 +27,68 @@ ruff = "^0.9.1"
 black = "^25.1.0"
 pre-commit = "^4.0.1"
 ipykernel = "^6.29.5"
+mypy = "^1.15.0"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true
+
+check_untyped_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+
+ignore_missing_imports = false
+follow_imports = "silent"
+
+mypy_path = "hybrid_renewable_pypsa/src"
+
+exclude = [
+    '^cwd/.*$',        # Standalone scripts for generating profiles
+    '^tests/.*$',      # Test scripts may not need strict typing
+    '^docs/.*$',       # Documentation folder
+    '^data/.*$',       # Raw CSV data, profiles, metadata, etc.
+    '^results/.*$',    # Output plots and HTML reports
+    '^\.github/.*$',   # CI/CD workflow files
+]
+
+# MyPy per-module options:
+
+# Enforce strict typing in core source code (`src/`)
+[[tool.mypy.overrides]]
+module = "src.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_return_any = true
+
+# Allow standalone scripts (`cwd/`) to have untyped functions
+[[tool.mypy.overrides]]
+module = "cwd.*"
+disallow_untyped_defs = false
+
+# Allow missing imports for external libraries (e.g., PyPSA dependencies)
+[[tool.mypy.overrides]]
+module = [
+    "pypsa",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "scipy"
+]
+ignore_missing_imports = true
+
+# Tests should allow untyped function definitions
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
